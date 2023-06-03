@@ -6,18 +6,21 @@ public class UsuarioResponse
     {
     }
 
-    public UsuarioResponse(int usuarioId, string nombre, string apellido, string password, bool estado)
+    public UsuarioResponse(int usuarioId, string userName, string nickname, string password, string role, bool estado)
     {
         UsuarioId = usuarioId;
-        Nombre = nombre;
-        Apellido = apellido;
+        UserName = userName;
+        Nickname = nickname;
         Password = password;
+        Role = role;
         Estado = estado;
     }
 
     public int UsuarioId { get; set; }
-    public string Nombre { get; set; } = null!;
-    public string Apellido { get; set; } = null!;
+    public string UserName { get; set; } = null!;
+    public string Nickname { get; set; } = null!;
     public string Password { get; set; } = null!;
+    public string Role { get; set; } = null!;
     public bool Estado { get; set; }
 }
+

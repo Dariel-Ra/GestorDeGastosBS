@@ -8,3 +8,11 @@
 @using Microsoft.JSInterop
 @using GestorDeGastosBS
 @using GestorDeGastosBS.Shared
+@using GestorDeGastosBS.Data.Services
+@inject NavigationManager urlHelper;
+
+@inject IProveedorServices proveedorServices;
+@inject IGastosProveedorServices gastosProveedorServices;
+@inject IMercanciaServices mercanciaServices;
+@inject IGastosMercanciaServices gastosMercanciaServices;
+

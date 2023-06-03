@@ -1,4 +1,6 @@
-﻿namespace GestorDeGastosBS.Data.Response;
+﻿using GestorDeGastosBS.Data.Request;
+
+namespace GestorDeGastosBS.Data.Response;
 
 public class MercanciaResponse
 {
@@ -6,18 +8,32 @@ public class MercanciaResponse
     {
     }
 
-    public MercanciaResponse(int mercanciaId, string mercanciaNombre, string mercanciaDescripcion, ProveedorResponse? proveedor)
+    public MercanciaResponse(int mercanciaId, string mercanciaNombre, string mercanciaDescripcion, decimal precio, ProveedorResponse? proveedor)
     {
         MercanciaId = mercanciaId;
         MercanciaNombre = mercanciaNombre;
         MercanciaDescripcion = mercanciaDescripcion;
+        Precio = precio;
         Proveedor = proveedor;
     }
 
     public int MercanciaId { get; set; }
     public string MercanciaNombre { get; set; } = null!;
     public string MercanciaDescripcion { get; set; } = null!;
+    public decimal Precio { get; set; }
+    public int? ProveedorId { get; set; }
     public virtual ProveedorResponse? Proveedor { get; set; }
+
+    public MercanciaRequestUpdate ToRequest(){
+        return new MercanciaRequestUpdate{
+            MercanciaId = MercanciaId,
+            MercanciaNombre = MercanciaNombre,
+            MercanciaDescripcion = MercanciaDescripcion,
+            Precio = Precio,
+            ProveedorId = ProveedorId
+
+        };
+    }
 }
 
 public class ProveedorResponse
@@ -42,6 +58,19 @@ public class ProveedorResponse
     public string Telefono { get; set; } = null!;
     public string CorreoElectronico { get; set; } = null!;
     public bool Estado { get; set; }
+
+        public ProveedorRequestUpdate ToRequest() {
+        return new ProveedorRequestUpdate
+        {
+            ProveedorId = ProveedorId,
+            Nombre = Nombre,
+            Telefono = Telefono,
+            Direccion = Direccion,
+            CorreoElectronico = CorreoElectronico,
+            Estado = Estado
+            
+        };
+    }
 }
 
 public class EmpleadoResponse
@@ -77,10 +106,25 @@ public class GastosMiscelaneoResponse
 
 public class GastosProveedorResponse
 {
+    public GastosProveedorResponse()
+    {
+    }
+
     public int GastosProveedorId { get; set; }
     public DateTime Fecha { get; set; }
     public string Descripcion { get; set; } = null!;
-    public decimal Gastos { get; set; }
+    public decimal MontoTotal { get; set; }
+    public virtual ProveedorResponse? Proveedor { get; set; } 
+
+    public GastosProveedorRequest ToRequest(){
+        return new GastosProveedorRequest
+        {
+            GastosProveedorId = GastosProveedorId,
+            Fecha = Fecha,
+            Descripcion = Descripcion,
+            ProveedorId = Proveedor!.ProveedorId
+        };
+    }
 }
 
 public class GastosMercanciaResponse
@@ -89,11 +133,12 @@ public class GastosMercanciaResponse
     {
     }
 
-    public GastosMercanciaResponse(int gastosMercanciaId, DateTime fecha, int cantidad, string descripcion, MercanciaResponse mercancia)
+    public GastosMercanciaResponse(int gastosMercanciaId, DateTime fecha, int cantidad, decimal montoTotal, string descripcion, MercanciaResponse mercancia)
     {
         GastosMercanciaId = gastosMercanciaId;
         Fecha = fecha;
         Cantidad = cantidad;
+        MontoTotal = montoTotal;
         Descripcion = descripcion;
         Mercancia = mercancia;
     }
@@ -101,6 +146,19 @@ public class GastosMercanciaResponse
     public int GastosMercanciaId { get; set; }
     public DateTime Fecha { get; set; }
     public int Cantidad { get; set; }
+    public decimal MontoTotal { get; set; }
     public string Descripcion { get; set; } = null!;
     public virtual MercanciaResponse Mercancia { get; set; } = null!;
+
+        public GastosMercanciaRequestUpdate ToRequest(){
+        return new GastosMercanciaRequestUpdate
+        {
+            GastosMercanciaId = GastosMercanciaId,
+            Fecha = Fecha,
+            Cantidad = Cantidad,
+            MontoTotal = MontoTotal,
+            Descripcion = Descripcion,
+            MercanciaId = Mercancia!.MercanciaId
+        };
+    }
 }

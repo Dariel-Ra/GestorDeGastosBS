@@ -1,0 +1,51 @@
+@page "/login"
+@using GestorDeGastosBS.Authentication
+@inject UserAccountService userAccountService
+@inject IJSRuntime js
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager urlHelper
+
+<PageTitle>Login</PageTitle>
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 border">
+        <div class="mb-3 text-center">
+            <h3>LOGIN</h3>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="">User Name</label>
+        <input @bind="model.UserName" class="form-control" placeholder="User Name" type="text">
+    </div>
+    <div class="mb-3">
+        <label for="">Password</label>
+        <input @bind="model.Password" class="form-control" placeholder="Password" type="password">
+    </div>
+    <div class="mb-3 d-grid gap-2">
+        <button @onclick="Authenticate" class="btn btn-primary">Login</button>
+    </div>
+</div>    
+@code{
+    public class Model
+    {
+        public string? UserName { get; set; }
+        public string? Password { get; set; }
+    }
+    private Model model = new Model();
+    private async Task Authenticate() 
+    {
+        var userAccount = userAccountService.GetByUserName(model.UserName!);
+        if(userAccount == null || userAccount.Password != model.Password)
+        {
+            await js.InvokeVoidAsync("alert", "Invalid User Name or Password");
+            return;
+        }
+        var CustomAuthenticationStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await CustomAuthenticationStateProvider.UpdateAuthenticationState(new UserSession
+        {
+            UserName = userAccount.UserName,
+            Role = userAccount.Role
+        });
+        urlHelper.NavigateTo("/", true);
+    }
+}

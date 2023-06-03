@@ -1,0 +1,178 @@
+@page "/mercancias"
+
+@if (!ShowForm)
+{
+    <h3>Mercancia (@Usuarios.Count)</h3>
+    <div class="mb-2">
+        <button class="btn btn-success"
+            @onclick="()=>{ShowForm = !ShowForm;}">
+            Agregar
+        </button>
+    </div>
+}
+@if (ShowForm)
+{
+    <h3>@TituloForm</h3>
+    <EditForm Model="request" OnValidSubmit="Send">
+        <div class="form-group">
+            <div class="row g3">
+                <div class="col-md-6 col-lg-6">
+                    <label>Nombre</label>
+                    <InputText class="form-control" @bind-Value="request.MercanciaNombre"></InputText>
+                </div>
+
+                <div class="col-md-6 col-lg-6">
+                    <label>Proveedores</label>
+                    <InputSelect class="form-select" @bind-Value="request.ProveedorId" id="cbkActivo">
+                        <option disabled>Selecciona una ciudad</option>
+                        @foreach (var ciudad in Proveedores)
+                        {
+                            <option value="@ciudad.ProveedorId">
+                                @ciudad.Nombre
+                                </option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Precio</label>
+                    <InputNumber class="form-control" @bind-Value="request.Precio"></InputNumber>
+                </div>
+
+                <div class="py-2 col-md-max col-lg-max">
+                    <label>Descricción</label>
+                    <InputTextArea class="form-control" @bind-Value="request.MercanciaDescripcion"></InputTextArea>
+                </div>
+                
+
+            </div>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-outline-success">Guardar</button>
+            <button @onclick="Cancelar" class="btn btn-outline-danger">Cancelar</button>
+        </div>
+    </EditForm>
+    <br/>
+}
+@if(Usuarios != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Proveedor</th>
+                <th>Descricción</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var usuario in Usuarios){
+            <tr>
+                <td>@usuario.MercanciaId</td>
+                <td>@usuario.MercanciaNombre</td>
+                <td>@usuario.Precio</td>
+                <td>@usuario.Proveedor!.Nombre</td>
+                <td>@usuario.MercanciaDescripcion</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.MercanciaId)">
+
+                            <span class="oi oi-pencil"></span>
+                        </button>
+                        <button class="btn btn-danger">
+                            <span class="oi oi-trash"></span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Cargando..</p>
+}
+
+@code
+{
+    public string TituloForm => request.MercanciaId == 0 ? 
+    "Agregar Mercancia" : "Modificar Mercancia";
+    public bool ShowForm { get; set; } = false;
+    public string Filtro { get; set; } = "";
+    public List<MercanciaResponse> Usuarios { get; set; }
+        = new List<MercanciaResponse>();
+
+
+    public List<ProveedorResponse> Proveedores { get; set; } = new List<ProveedorResponse>();
+    public MercanciaRequestUpdate request { get; set; } = new MercanciaRequestUpdate();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarContactos();
+        await CargarProveedores();
+    }
+
+    async Task CargarContactos()
+    {
+        var response = await mercanciaServices.Consultar(Filtro);
+        if (response.Succeeded)
+        {
+            Usuarios = response.Data!;
+        }
+    }
+
+    void Cancelar()
+    {
+        request  = new MercanciaRequestUpdate();
+        ShowForm = false;
+    }
+
+    async Task CargarProveedores()
+    {
+        var resultado = await proveedorServices.Consultar(Filtro);
+        if (resultado.Succeeded)
+        {
+            Proveedores = resultado.Data!;
+        }
+    }
+
+    public async Task Send()
+    {
+        if(request.MercanciaId == 0)
+        {
+            //Debo registrar el contacto..
+            var r = await mercanciaServices.Crear(request);
+            if (r.Succeeded)
+            {
+                Cancelar();
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            //Debo solicitar modificar el contacto...
+            var r = await mercanciaServices.Modificar(request);
+            if (r.Succeeded)
+            {
+                Cancelar();
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+    }
+    	
+    public void Seleccionar(int Id)
+    {
+        ShowForm = true;
+        request = Usuarios
+        .Where(c => c.MercanciaId == Id)
+        .Select(c => c.ToRequest())
+        .FirstOrDefault()??new MercanciaRequestUpdate();
+    }
+    
+
+}
+

@@ -1,4 +1,3 @@
-
 using System.Security.Claims;
 using GestorDeGastosBS.Data.Context;
 using GestorDeGastosBS.Data.Wrapper;
@@ -9,17 +8,17 @@ using Microsoft.AspNetCore.Http;
 
 namespace GestorDeGastosBS.Data.Services;
 
-public interface IAuthService
+public interface IAuthSessionService
 {
     Task<Result<bool>> Login(string nick, string pass);
 }
 
-public class AuthService : IAuthService
+public class AuthSessionService : IAuthSessionService
 {
     private readonly IMyDbContext dbContext;
     private readonly IHttpContextAccessor httpContextAccessor;
 
-    public AuthService(IMyDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+    public AuthSessionService(IMyDbContext dbContext, IHttpContextAccessor httpContextAccessor)
     {
         this.dbContext = dbContext;
         this.httpContextAccessor = httpContextAccessor;
@@ -33,26 +32,7 @@ public class AuthService : IAuthService
             if (user == null) return Result<bool>.Fail("Credenciales invalidas");
             if (user.Password == pass)
             {
-                //Logica para crear la cookies de inicio de sesion...
-                var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Nickname)
-                // Agrega más claims si necesitas información adicional en la cookie
-            };
-
-                var claimsIdentity = new ClaimsIdentity(
-                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                var authProperties = new AuthenticationProperties
-                {
-                    // Opciones adicionales para configurar la cookie
-                };
-
-                await httpContextAccessor.HttpContext!.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
-
+                
                 return Result<bool>.Success(true, "Bienvenido");
             }
             return Result<bool>.Fail("Credenciales invalidas");

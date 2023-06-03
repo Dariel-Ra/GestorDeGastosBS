@@ -1,13 +1,25 @@
 ﻿@page "/fetchdata"
 @using GestorDeGastosBS.Data
 @inject WeatherForecastService ForecastService
+@*using iTextSharp.text;*
+@*using iTextSharp.text.pdf;
+@using PdfSharpCore.Drawing;
+@using PdfSharpCore.Drawing.Layout;
+@using PdfSharpCore.Pdf;
+@using MigraDocCore.DocumentObjectModel;
+@using MigraDocCore.DocumentObjectModel.Tables;
+@using MigraDocCore.Rendering;
+@using PdfSharpCore.Fonts;*@
+
+@inject IJSRuntime JSRuntime
+
 
 <PageTitle>Weather forecast</PageTitle>
 
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from a service.</p>
-
+<button @onclick="GeneratePdf">Generar PDF</button>
 @if (forecasts == null)
 {
     <p><em>Loading...</em></p>
@@ -44,4 +56,123 @@ else
     {
         forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
     }
+
+        private async Task GeneratePdf()
+        {
+            var memoryStream = new MemoryStream();
+            await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", "WeatherForecast.pdf", "application/pdf", memoryStream.ToArray());
+        }
+
+
+    #region PDF libraries Code.
+    @*
+    private async Task GeneratePdf()
+    {
+    var document = new Document();
+    var section = document.AddSection();
+    section.PageSetup.TopMargin = Unit.FromCentimeter(0.5);
+    
+    // Add title
+    var title = section.AddParagraph("Weather forecast");
+    title.Format.Alignment = ParagraphAlignment.Center;
+    title.Format.Font.Size = 16;
+    title.Format.Font.Bold = true;
+    section.AddParagraph().AddLineBreak();
+    // Crear tabla
+    var table = section.AddTable();
+    table.Style = "Table";
+    table.Borders.Color = Colors.Black;
+    table.Shading.Color = Colors.Aquamarine;
+
+    // Definir columnas de la tabla
+    var column = table.AddColumn("3cm");
+    column.Format.Alignment = ParagraphAlignment.Center;
+
+    column = table.AddColumn("3cm");
+    column.Format.Alignment = ParagraphAlignment.Center;
+
+    column = table.AddColumn("3cm");
+    column.Format.Alignment = ParagraphAlignment.Center;
+
+    column = table.AddColumn("6cm");
+    column.Format.Alignment = ParagraphAlignment.Center;
+
+    // Agregar encabezados de columna
+    var headerRow = table.AddRow();
+    headerRow.Format.Alignment = ParagraphAlignment.Center;
+    headerRow.Style = "HeadingRow";
+    headerRow.Format.Font.Bold = true;
+
+    headerRow.Cells[0].AddParagraph("Date");
+    headerRow.Cells[1].AddParagraph("Temp. (C)");
+    headerRow.Cells[2].AddParagraph("Temp. (F)");
+    headerRow.Cells[3].AddParagraph("Summary");
+
+    // Agregar filas de datos
+    foreach (var forecast in forecasts)
+    {
+        var dataRow = table.AddRow();
+        dataRow.Cells[0].AddParagraph(forecast.Date.ToShortDateString());
+        dataRow.Cells[1].AddParagraph(forecast.TemperatureC.ToString());
+        dataRow.Cells[2].AddParagraph(forecast.TemperatureF.ToString());
+        dataRow.Cells[3].AddParagraph(forecast.Summary);
+    }
+
+    
+    // Guardar el documento en un MemoryStream
+    var memoryStream = new MemoryStream();
+    var pdfRenderer = new PdfDocumentRenderer();
+    pdfRenderer.Document = document;
+    pdfRenderer.RenderDocument();
+    pdfRenderer.PdfDocument.Save(memoryStream);
+    memoryStream.Seek(0, SeekOrigin.Begin);
+
+        var contentType = "application/pdf";
+        var fileName = "weather_forecast.pdf";
+
+        await JSRuntime.InvokeVoidAsync("saveAsFile", fileName, contentType, memoryStream.ToArray());
+    }
+    *@
+
+    @* 
+    private async Task GeneratePdf() 
+    {
+        // Crear un nuevo documento PDF
+        Document document = new Document();
+
+        // Crear un objeto MemoryStream para escribir el contenido del PDF
+        using (MemoryStream memoryStream = new MemoryStream())
+        {
+            // Crear un escritor de PDF a partir del documento y el flujo de memoria
+            PdfWriter writer = PdfWriter.GetInstance(document, memoryStream);
+
+            // Abrir el documento para escribir contenido
+            document.Open();
+
+            // Crear una tabla en el documento PDF
+            PdfPTable table = new PdfPTable(4);
+
+            // Agregar las celdas a la tabla
+            foreach (var forecast in forecasts)
+            {
+                table.AddCell(forecast.Date.ToShortDateString());
+                table.AddCell(forecast.TemperatureC.ToString());
+                table.AddCell(forecast.TemperatureF.ToString());
+                table.AddCell(forecast.Summary);
+            }
+
+            // Agregar la tabla al documento
+            document.Add(table);
+
+            // Cerrar el documento
+            document.Close();
+
+            // Escribir el flujo de memoria en el flujo de respuesta HTTP
+            await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", "WeatherForecast.pdf", "application/pdf", memoryStream.ToArray());
+
+        }
+    }
+     *@
+    #endregion
+    
 }

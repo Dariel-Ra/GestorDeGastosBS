@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using GestorDeGastosBS.Data.Models;
 
+
 namespace GestorDeGastosBS.Data.Context;
 
 public interface IMyDbContext

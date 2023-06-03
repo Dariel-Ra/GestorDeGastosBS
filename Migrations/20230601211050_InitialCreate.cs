@@ -33,27 +33,12 @@ namespace GestorDeGastosBS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Descricción = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GastosMiscelaneos", x => x.GastosMiscelaneoId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GastosProveedores",
-                columns: table => new
-                {
-                    GastosProveedorId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Descricción = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gastos = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GastosProveedores", x => x.GastosProveedorId);
                 });
 
             migrationBuilder.CreateTable(
@@ -80,7 +65,7 @@ namespace GestorDeGastosBS.Migrations
                     UsuarioId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
-                    Apellido = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
+                    Nickname = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Estado = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -109,6 +94,27 @@ namespace GestorDeGastosBS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GastosProveedores",
+                columns: table => new
+                {
+                    GastosProveedorId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "Date", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gastos = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ProveedorId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GastosProveedores", x => x.GastosProveedorId);
+                    table.ForeignKey(
+                        name: "FK_GastosProveedores_Proveedores_ProveedorId",
+                        column: x => x.ProveedorId,
+                        principalTable: "Proveedores",
+                        principalColumn: "ProveedorId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Mercancias",
                 columns: table => new
                 {
@@ -116,6 +122,7 @@ namespace GestorDeGastosBS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MercanciaNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MercanciaDescripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ProveedorId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -136,7 +143,7 @@ namespace GestorDeGastosBS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fecha = table.Column<DateTime>(type: "Date", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
-                    Descricción = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MercanciaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -215,6 +222,11 @@ namespace GestorDeGastosBS.Migrations
                 name: "IX_GastosMercancias_MercanciaId",
                 table: "GastosMercancias",
                 column: "MercanciaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GastosProveedores_ProveedorId",
+                table: "GastosProveedores",
+                column: "ProveedorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Mercancias_ProveedorId",

@@ -1,9 +1,10 @@
-﻿namespace GestorDeGastosBS.Data.Requests;
+﻿namespace GestorDeGastosBS.Data.Request;
 
 public class MercanciaRequest
 {
     public string MercanciaNombre { get; set; } = null!;
     public string MercanciaDescripcion { get;set; } = null!; 
+    public decimal Precio { get; set; }
     public int? ProveedorId { get; set; }
 }
 public class MercanciaRequestUpdate : MercanciaRequest
@@ -54,25 +55,29 @@ public class GastosMiscelaneoRequest{
     public int GastosMiscelaneoId { get; set; }
     public DateTime Fecha { get; set; }
     public string Nombre { get; set; } = null!;
-    public string Descricción { get; set; } = null!;
+    public string Descripcion { get; set; } = null!;
     public int Cantidad { get; set; }
 }
 
 public class GastosProveedorRequest{
     public int GastosProveedorId { get; set; }
     public DateTime Fecha { get; set; }
-    public string Descricción { get; set; } = null!;
-    public decimal Gastos { get; set; }
+    public string Descripcion { get; set; } = null!;
+    public decimal MontoTotal { get; set; }
+    public int? ProveedorId { get; set; }
 
 }
 
 public class GastosMercanciaRequest{
     public DateTime Fecha { get; set; }
     public int Cantidad { get; set; }
-    public string Descricción { get; set; } = null!;
+    public decimal MontoTotal { get; set; }
+    public string Descripcion { get; set; } = null!;
     public int MercanciaId { get; set; }
 }
 public class GastosMercanciaRequestUpdate : GastosMercanciaRequest
 {
     public int GastosMercanciaId { get; set; }
 }
+
+

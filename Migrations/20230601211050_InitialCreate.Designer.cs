@@ -4,6 +4,7 @@ using GestorDeGastosBS.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestorDeGastosBS.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230601211050_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,21 +33,12 @@ namespace GestorDeGastosBS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmpleadoId"));
 
-                    b.Property<string>("Cargo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Cedula")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("Estado")
                         .HasColumnType("bit");
 
                     b.Property<string>("NombreCompleto")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Sueldo")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("EmpleadoId");
 
@@ -108,9 +102,6 @@ namespace GestorDeGastosBS.Migrations
                     b.Property<int>("MercanciaId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("MontoTotal")
-                        .HasColumnType("decimal(18,2)");
-
                     b.HasKey("GastosMercanciaId");
 
                     b.HasIndex("MercanciaId");
@@ -136,9 +127,6 @@ namespace GestorDeGastosBS.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("MontoTotal")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -163,7 +151,7 @@ namespace GestorDeGastosBS.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("Date");
 
-                    b.Property<decimal>("MontoTotal")
+                    b.Property<decimal>("Gastos")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ProveedorId")
@@ -213,23 +201,8 @@ namespace GestorDeGastosBS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Nominaid"));
 
-                    b.Property<decimal>("Deducciones")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int>("EmpleadoId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Incentivos")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("MontoBruto")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("MontoNeto")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Nominaid");
 

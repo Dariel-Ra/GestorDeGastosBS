@@ -1,0 +1,184 @@
+@page "/gastosproveedores"
+
+@if (!ShowForm)
+{
+    <h3>Gastos Proveedores (@Usuarios.Count)</h3>
+    <div class="mb-2">
+        <button class="btn btn-success"
+            @onclick="()=>{ShowForm = !ShowForm;}">
+            Agregar
+        </button>
+    </div>
+}
+@if (ShowForm)
+{
+    <h3>@TituloForm</h3>
+    <EditForm Model="request" OnValidSubmit="Send">
+        <div class="form-group">
+            <div class="row g3">
+
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Proveedores</label>
+                    <InputSelect class="py-md-1 form-select" @bind-Value="request.ProveedorId" id="cbkActivo">
+                        <option disabled>Selecciona una ciudad</option>
+                        @foreach (var ciudad in Proveedores)
+                        {
+                            <option value="@ciudad.ProveedorId">
+                                @ciudad.Nombre
+                                </option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Gastos</label>
+                    <InputNumber class="form-control" @bind-Value="request.MontoTotal"></InputNumber>
+                </div>
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Fecha</label>
+                    <InputDate class="form-control" @bind-Value="request.Fecha"></InputDate>
+                </div>
+
+                <div class="py-md-1 col-md-max col-lg-max">
+                    <label>Descripción</label>
+                    <InputTextArea class="form-control" @bind-Value="request.Descripcion"></InputTextArea>
+                </div>
+
+            </div>
+        </div>
+        <div class="btn-group pt-1">
+            <button type="submit" class="btn btn-outline-success">Guardar</button>
+            <button @onclick="Cancelar" class="btn btn-outline-danger">Cancelar</button>
+        </div>
+    </EditForm>
+    <br/>
+}
+@if(Usuarios != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Proveedores</th>
+                <th>Gastos</th>
+                <th>Descripción</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var usuario in Usuarios){
+            <tr>
+                <td>@usuario.GastosProveedorId</td>
+                <td>@usuario.Fecha.ToString("MM/dd/yyyy")</td>
+                <td>@usuario.Proveedor!.Nombre</td>
+                <td>@usuario.MontoTotal</td>
+                <td>@usuario.Descripcion</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.GastosProveedorId)">
+
+                            <span class="oi oi-pencil"></span>
+                        </button>
+                        <button class="btn btn-danger">
+                            <span class="oi oi-trash"></span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Cargando..</p>
+}
+
+@code
+{
+    public string TituloForm => request.ProveedorId == 0 ? 
+    "Agregar proveedor" : "Modificar proveedor";
+    public bool ShowForm { get; set; } = false;
+    public string Filtro { get; set; } = "";
+    public List<GastosProveedorResponse> Usuarios { get; set; }
+        = new List<GastosProveedorResponse>();
+
+    public List<ProveedorResponse> Proveedores { get; set; } = new List<ProveedorResponse>();
+    public GastosProveedorRequest request { get; set; } = new GastosProveedorRequest();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarContactos();
+        await CargarProveedores();
+    }
+
+    async Task CargarContactos()
+    {
+        var response = await gastosProveedorServices.Consultar(Filtro);
+        if (response.Succeeded)
+        {
+            Usuarios = response.Data!;
+        }
+    }
+
+    async Task CargarProveedores()
+    {
+        var resultado = await proveedorServices.Consultar(Filtro);
+        if (resultado.Succeeded)
+        {
+            Proveedores = resultado.Data!;
+        }
+    }
+
+    void Cancelar()
+    {
+        request  = new GastosProveedorRequest();
+        ShowForm = false;
+    }
+
+    public async Task Send()
+    {
+        if(request.GastosProveedorId == 0)
+        {
+            //Debo registrar el contacto..
+            var r = await gastosProveedorServices.Crear(request);
+            if (r.Succeeded)
+            {
+                Cancelar();
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            //Debo solicitar modificar el contacto...
+            var r = await gastosProveedorServices.Modificar(request);
+            if (r.Succeeded)
+            {
+                Cancelar();
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+    }
+    	
+    public void Seleccionar(int Id)
+    {
+        ShowForm = true;
+        request = Usuarios
+        .Where(c => c.GastosProveedorId == Id)
+        .Select(c => c.ToRequest())
+        .FirstOrDefault()??new GastosProveedorRequest();
+    }
+    
+    public void Agregar()
+    {
+        urlHelper.NavigateTo("/proveedores/crear",false);
+    }
+    public void Editar(int Id)
+    {
+        urlHelper.NavigateTo($"/proveedores/editar/{Id}",false);
+    }
+}
+

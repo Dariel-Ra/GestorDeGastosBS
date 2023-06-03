@@ -1,0 +1,54 @@
+@page "/loginTest"
+@using GestorDeGastosBS.Data.Services
+@inject NavigationManager NavigationManager
+
+
+<h3>Iniciar sesión</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="nick">Nombre de usuario:</label>
+        <InputText id="nick" class="form-control" @bind-Value="loginModel.Nick" />
+        <ValidationMessage For="@(() => loginModel.Nick)" />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Contraseña:</label>
+        <InputText id="password" class="form-control" @bind-Value="loginModel.Password" />
+        <ValidationMessage For="@(() => loginModel.Password)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+
+    [Inject]
+    private IAuthService? authService { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        var result = await authService!.Login(loginModel.Nick!, loginModel.Password!);
+
+        if (result.Succeeded)
+        {
+            // Redireccionar al usuario a otra página después de iniciar sesión exitosamente
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            // Mostrar mensaje de error al usuario
+            // result.ErrorMessage contiene el mensaje de error devuelto por el servicio AuthService
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+
+    private class LoginModel
+    {
+        public string? Nick { get; set; }
+        public string? Password { get; set; }
+    }
+}

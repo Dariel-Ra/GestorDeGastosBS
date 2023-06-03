@@ -1,0 +1,182 @@
+@page "/proveedores"
+
+@if (!ShowForm)
+{
+    <h3>Proveedores (@Usuarios.Count)</h3>
+    <div class="mb-2">
+        <button class="btn btn-success"
+            @onclick="()=>{ShowForm = !ShowForm;}">
+            Agregar
+        </button>
+    </div>
+}
+@if (ShowForm)
+{
+    <h3>@TituloForm</h3>
+    <EditForm Model="request" OnValidSubmit="Send">
+        <div class="form-group">
+            <div class="row g3">
+                <div class="col-md-6 col-lg-6">
+                    <label>Nombre</label>
+                    <InputText class="form-control" @bind-Value="request.Nombre"></InputText>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <label>Dirección</label>
+                    <InputText class="form-control" @bind-Value="request.Direccion"></InputText>
+                </div>
+
+
+                <div class="col-md-6 col-lg-6">
+                    <label>Telefono</label>
+                    <InputText class="form-control" @bind-Value="request.Telefono"></InputText>
+                </div>
+
+                <div class="col-md-6 col-lg-6">
+                    <label>Correo Electronico</label>
+                    <InputText class="form-control" @bind-Value="request.CorreoElectronico"></InputText>
+                </div>
+
+                
+                <div for="cbkActivo" class="p-2 col-md-6 col-lg-6">
+                    <label for="cbkActivo">Estado</label>
+                    <InputCheckbox class="form-proveedor" @bind-Value="request.Estado" id="cbkActivo"></InputCheckbox>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-outline-success">Guardar</button>
+            <button @onclick="Cancelar" class="btn btn-outline-danger">Cancelar</button>
+        </div>
+    </EditForm>
+    <br/>
+}
+@if(Usuarios != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Telefono</th>
+                <th>Correo Electronico</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var usuario in Usuarios){
+            <tr>
+                <td>@usuario.ProveedorId</td>
+                <td>@usuario.Nombre</td>
+                <td>@usuario.Direccion</td>
+                <td>@usuario.Telefono</td>
+                <td>@usuario.CorreoElectronico</td>
+                <td>@usuario.Estado</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.ProveedorId)">
+
+                            <span class="oi oi-pencil"></span>
+                        </button>
+                        <button class="btn btn-danger" @onclick="()=>Eliminar(usuario)">
+                            <span class="oi oi-trash"></span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Cargando..</p>
+}
+
+@code
+{
+    public string TituloForm => request.ProveedorId == 0 ? 
+    "Agregar proveedor" : "Modificar proveedor";
+    public bool ShowForm { get; set; } = false;
+    public string Filtro { get; set; } = "";
+    public List<ProveedorResponse> Usuarios { get; set; }
+        = new List<ProveedorResponse>();
+
+    public ProveedorRequestUpdate request { get; set; } = new ProveedorRequestUpdate();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarContactos();
+    }
+
+    async Task CargarContactos()
+    {
+        var response = await proveedorServices.Consultar(Filtro);
+        if (response.Succeeded)
+        {
+            Usuarios = response.Data!;
+        }
+    }
+
+    void Cancelar()
+    {
+        request  = new ProveedorRequestUpdate();
+        ShowForm = false;
+    }
+
+    public async Task Send()
+    {
+        if(request.ProveedorId == 0)
+        {
+            //Debo registrar el contacto..
+            var r = await proveedorServices.Crear(request);
+            if (r.Succeeded)
+            {
+                Cancelar();
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            //Debo solicitar modificar el contacto...
+            var r = await proveedorServices.Modificar(request);
+            if (r.Succeeded)
+            {
+                Cancelar();
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+    }
+    	
+    public void Seleccionar(int Id)
+    {
+        ShowForm = true;
+        request = Usuarios
+        .Where(c => c.ProveedorId == Id)
+        .Select(c => c.ToRequest())
+        .FirstOrDefault()??new ProveedorRequestUpdate();
+    }
+
+    public async Task Eliminar(ProveedorResponse contacto)
+    {
+        var resultado = await proveedorServices.SoftDeleted(contacto.ToRequest());
+        if (resultado.Succeeded)
+        {
+            await CargarContactos();
+            StateHasChanged();
+        }
+    }
+    
+    public void Agregar()
+    {
+        urlHelper.NavigateTo("/proveedores/crear",false);
+    }
+    public void Editar(int Id)
+    {
+        urlHelper.NavigateTo($"/proveedores/editar/{Id}",false);
+    }
+}
+

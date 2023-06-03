@@ -4,6 +4,11 @@ using GestorDeGastosBS.Data;
 using GestorDeGastosBS.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using GestorDeGastosBS.Data.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using GestorDeGastosBS.Data.Models;
+using GestorDeGastosBS.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +19,21 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddDbContext<MyDbContext>();
 builder.Services.AddScoped<IMyDbContext,MyDbContext>();
 builder.Services.AddScoped<IAuthService,AuthService>();
+
+builder.Services.AddScoped<IProveedorServices, ProveedorServices>();
+builder.Services.AddScoped<IMercanciaServices, MercanciaServices>();
+
+builder.Services.AddScoped<IGastosProveedorServices, GastosProveedorServices>();
+builder.Services.AddScoped<IGastosMercanciaServices, GastosMercanciaServices>();
+builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddSingleton<UserAccountService>();
+builder.Services.AddAuthenticationCore();
+builder.Services.AddHttpContextAccessor();
+// builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+// .AddCookie();
+
+
 
 
 var app = builder.Build();
@@ -37,5 +57,7 @@ app.MapFallbackToPage("/_Host");
 using(var serviceSope = app.Services.GetService<IServiceScopeFactory>()!.CreateAsyncScope()){
     var dbContext = serviceSope.ServiceProvider.GetRequiredService<MyDbContext>();
     dbContext.Database.Migrate();
+
+    await MyDbContextSeeder.Inicializar(dbContext);
 }
 app.Run();
