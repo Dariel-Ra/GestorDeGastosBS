@@ -1,8 +1,8 @@
-@page "/gastosmercancias"
+@page "/gastosmiscelaneos"
 
 @if (!ShowForm)
 {
-    <h3>Gastos Mercancia (@Usuarios.Count)</h3>
+    <h3>Gastos Miscelaneos (@Usuarios.Count)</h3>
     <div class="mb-2">
         <button class="btn btn-success"
             @onclick="()=>{ShowForm = !ShowForm;}">
@@ -17,26 +17,18 @@
         <div class="form-group">
             <div class="row g3">
                 <div class="py-md-1 col-md-3 col-lg-3">
-                    <label>Mercancia</label>
-                    <InputSelect class="py-md-1 form-select" @bind-Value="request.MercanciaId" id="cbkActivo">
-                        <option disabled>Selecciona una ciudad</option>
-                        @foreach (var ciudad in Mercancias)
-                        {
-                            <option value="@ciudad.MercanciaId">
-                                @ciudad.MercanciaNombre
-                            </option>
-                        }
-                    </InputSelect>
+                    <label>Nombre</label>
+                    <InputText class="form-control" @bind-Value="request.Nombre" id="cbkActivo"></InputText>
                 </div>
 
                 <div class="py-md-1 col-md-2 col-lg-2 col-xxl-2 col-xl-2">
                     <label>Cantidad</label>
-                    <InputNumber class="form-control" @bind-Value="request.Cantidad" @oninput="CalcularMontoTotal" @onkeypress="CalcularMontoTotal"></InputNumber>
+                    <InputNumber class="form-control" @bind-Value="request.Cantidad"></InputNumber>
                 </div>
 
                 <div class="py-md-1 col-md-2 col-lg-2">
-                    <label>MontoTotal</label>
-                    <InputNumber class="form-control" @bind-Value="request.MontoTotal" ></InputNumber>
+                    <label>Precio</label>
+                    <InputNumber class="form-control" @bind-Value="@request.MontoTotal"></InputNumber>
                 </div>
                 <div class="py-md-1 col-md-3 col-lg-3">
                     <label>Fecha</label>
@@ -63,8 +55,8 @@
         <thead>
             <tr>
                 <th>#</th>
+                <th>Nombre</th>
                 <th>Fecha</th>
-                <th>Mercancia</th>
                 <th>Cantidad</th>
                 <th>Monto Total</th>
                 <th>Descripción</th>
@@ -74,15 +66,15 @@
         <tbody>
             @foreach (var usuario in Usuarios){
             <tr>
-                <td>@usuario.GastosMercanciaId</td>
+                <td>@usuario.GastosMiscelaneoId</td>
+                <td>@usuario.Nombre</td>
                 <td>@usuario.Fecha.ToString("MMMM/dd/yyyy")</td>
-                <td>@usuario.Mercancia.MercanciaNombre</td>
                 <td>@usuario.Cantidad</td>
                 <td>@usuario.MontoTotal</td>
                 <td>@usuario.Descripcion</td>
                 <td>
                     <div class="btn-group">
-                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.GastosMercanciaId)">
+                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.GastosMiscelaneoId)">
 
                             <span class="oi oi-pencil"></span>
                         </button>
@@ -95,7 +87,6 @@
             }
         </tbody>
     </table>
-    
 }
 else
 {
@@ -104,65 +95,41 @@ else
 
 @code
 {
-    public string TituloForm => request.GastosMercanciaId == 0 ? 
+    public string TituloForm => request.GastosMiscelaneoId == 0 ? 
     "Agregar gastos de la Mercancia" : "Modificar gastos de la Mercancia";
     public bool ShowForm { get; set; } = false;
     public string Filtro { get; set; } = "";
-    public List<GastosMercanciaResponse> Usuarios { get; set; }
-        = new List<GastosMercanciaResponse>();
+    public List<GastosMiscelaneoResponse> Usuarios { get; set; }
+        = new List<GastosMiscelaneoResponse>();
 
-    public List<ProveedorResponse> Proveedores { get; set; } = new List<ProveedorResponse>();
-    
-    public List<MercanciaResponse> Mercancias { get; set; } = new List<MercanciaResponse>();
-
-    public GastosMercanciaRequestUpdate request { get; set; } = new GastosMercanciaRequestUpdate();
+    public GastosMiscelaneoRequest request { get; set; } = new GastosMiscelaneoRequest();
 
     protected override async Task OnInitializedAsync()
     {
         await CargarContactos();
-        await CargarProveedores();
-        await CargarMercancias();
     }
 
     async Task CargarContactos()
     {
-        var response = await gastosMercanciaServices.Consultar(Filtro);
+        var response = await gastosMiscelaneoServices.Consultar(Filtro);
         if (response.Succeeded)
         {
             Usuarios = response.Data!;
         }
     }
 
-    async Task CargarProveedores()
-    {
-        var resultado = await proveedorServices.Consultar(Filtro);
-        if (resultado.Succeeded)
-        {
-            Proveedores = resultado.Data!;
-        }
-    }
-
-    async Task CargarMercancias()
-    {
-        var resultado = await mercanciaServices.Consultar(Filtro);
-        if (resultado.Succeeded)
-        {
-            Mercancias = resultado.Data!;
-        }
-    }
-
     void Cancelar()
     {
-        request  = new GastosMercanciaRequestUpdate();
+        request  = new GastosMiscelaneoRequest();
         ShowForm = false;
     }
 
     public async Task Send()
     {
-        if(request.GastosMercanciaId == 0)
+        if(request.GastosMiscelaneoId == 0)
         {
             //Debo registrar el contacto..
-            var r = await gastosMercanciaServices.Crear(request);
+            var r = await gastosMiscelaneoServices.Crear(request);
             if (r.Succeeded)
             {
                 Cancelar();
@@ -173,7 +140,7 @@ else
         else
         {
             //Debo solicitar modificar el contacto...
-            var r = await gastosMercanciaServices.Modificar(request);
+            var r = await gastosMiscelaneoServices.Modificar(request);
             if (r.Succeeded)
             {
                 Cancelar();
@@ -187,24 +154,11 @@ else
     {
         ShowForm = true;
         request = Usuarios
-        .Where(c => c.GastosMercanciaId == Id)
+        .Where(c => c.GastosMiscelaneoId == Id)
         .Select(c => c.ToRequest())
-        .FirstOrDefault()??new GastosMercanciaRequestUpdate();
+        .FirstOrDefault()??new GastosMiscelaneoRequest();
     }
     
-void CalcularMontoTotal()
-{
-    var mercanciaSeleccionada = Mercancias.FirstOrDefault(m => m.MercanciaId == request.MercanciaId);
-    if (mercanciaSeleccionada != null)
-    {
-        request.MontoTotal = request.Cantidad * mercanciaSeleccionada.Precio;
-    }
-    else
-    {
-        request.MontoTotal = 0;
-    }
-}
-
     
 
 

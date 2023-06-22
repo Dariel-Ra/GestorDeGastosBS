@@ -90,10 +90,52 @@ namespace GestorDeGastosBS.Data.Context
                         Nickname = "Dariel",
                         Password = "1234.abcd",
                         Role = "Admin",
-                        Estado = true
+                        Estado = false
+                    },
+                    new Usuario()
+                    {
+                        UserName = "Ramon",
+                        Nickname = "Ramon",
+                        Password = "abcd.1234",
+                        Role = "Admin",
+                        Estado = false
+                    },
+                    new Usuario()
+                    {
+                        UserName = "Jose M.",
+                        Nickname = "Jose",
+                        Password = "abcd",
+                        Role = "Empleado",
+                        Estado = false
+                    },
+                    new Usuario()
+                    {
+                        UserName = "Humberto Gil",
+                        Nickname = "Humberto",
+                        Password = "1234",
+                        Role = "User",
+                        Estado = false
                     }
                 };
                 dbContext.Usuarios.AddRange(mercancias);
+                await dbContext.SaveChangesAsync();
+            }
+
+            
+            if (!dbContext.Empleados.Any())
+            {
+                var mercancias = new List<Empleado>() 
+                {
+                    new Empleado()
+                    {
+                        NombreCompleto = "Dariel Rafael",
+                        Cargo = "IT",
+                        Cedula = "12821565691",
+                        Sueldo = 39000,
+                        Inactivo = false
+                    }
+                };
+                dbContext.Empleados.AddRange(mercancias);
                 await dbContext.SaveChangesAsync();
             }
         }

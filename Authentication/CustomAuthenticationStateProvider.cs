@@ -20,7 +20,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
         try
         {
-            var userSessionStorageResult = await _sessionStorage.GetAsync<UserSession>("UserSession");
+        var userSessionStorageResult = await _sessionStorage.GetAsync<UserSession>("UserSession");
         var userSession = userSessionStorageResult.Success ? userSessionStorageResult.Value : null;
         if (userSession == null)
             return await Task.FromResult(new AuthenticationState(_anonymous));

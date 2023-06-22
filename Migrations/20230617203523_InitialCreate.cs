@@ -18,7 +18,10 @@ namespace GestorDeGastosBS.Migrations
                     EmpleadoId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NombreCompleto = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Estado = table.Column<bool>(type: "bit", nullable: false)
+                    Cargo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Cedula = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sueldo = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Inactivo = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -31,10 +34,11 @@ namespace GestorDeGastosBS.Migrations
                 {
                     GastosMiscelaneoId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Cantidad = table.Column<int>(type: "int", nullable: false)
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Cantidad = table.Column<int>(type: "int", nullable: false),
+                    MontoTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,9 +68,10 @@ namespace GestorDeGastosBS.Migrations
                 {
                     UsuarioId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nombre = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
                     Nickname = table.Column<string>(type: "nvarchar(45)", maxLength: 45, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Estado = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -78,13 +83,18 @@ namespace GestorDeGastosBS.Migrations
                 name: "Nominas",
                 columns: table => new
                 {
-                    Nominaid = table.Column<int>(type: "int", nullable: false)
+                    NominaId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Incentivos = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    MontoBruto = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Deducciones = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    MontoNeto = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     EmpleadoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Nominas", x => x.Nominaid);
+                    table.PrimaryKey("PK_Nominas", x => x.NominaId);
                     table.ForeignKey(
                         name: "FK_Nominas_Empleados_EmpleadoId",
                         column: x => x.EmpleadoId,
@@ -101,7 +111,7 @@ namespace GestorDeGastosBS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fecha = table.Column<DateTime>(type: "Date", nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Gastos = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MontoTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ProveedorId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -122,7 +132,7 @@ namespace GestorDeGastosBS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MercanciaNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MercanciaDescripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Precio = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ProveedorId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -143,6 +153,7 @@ namespace GestorDeGastosBS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fecha = table.Column<DateTime>(type: "Date", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
+                    MontoTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MercanciaId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -194,7 +205,7 @@ namespace GestorDeGastosBS.Migrations
                         name: "FK_GastosGenerales_Nominas_Nominaid",
                         column: x => x.Nominaid,
                         principalTable: "Nominas",
-                        principalColumn: "Nominaid",
+                        principalColumn: "NominaId",
                         onDelete: ReferentialAction.Cascade);
                 });
 

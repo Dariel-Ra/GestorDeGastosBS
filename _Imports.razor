@@ -9,10 +9,26 @@
 @using GestorDeGastosBS
 @using GestorDeGastosBS.Shared
 @using GestorDeGastosBS.Data.Services
+@* @using ChartJs.Blazor;
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Axes.Ticks
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.Common.Handlers
+@using ChartJs.Blazor.Common.Time
+@using ChartJs.Blazor.Util
+@using ChartJs.Blazor.Interop *@
+
+@using Blazorise.Bootstrap
+@using Blazorise.Icons.FontAwesome
+
 @inject NavigationManager urlHelper;
 
 @inject IProveedorServices proveedorServices;
-@inject IGastosProveedorServices gastosProveedorServices;
 @inject IMercanciaServices mercanciaServices;
+@inject INominaServices nominaServices;
+@inject IEmpleadoServices empleadoServices;
+@inject IGastosProveedorServices gastosProveedorServices;
 @inject IGastosMercanciaServices gastosMercanciaServices;
+@inject IGastosMiscelaneoServices gastosMiscelaneoServices;
 

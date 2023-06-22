@@ -85,7 +85,7 @@ public class MercanciaServices : IMercanciaServices
         try
         {
             var contacto = await dbContext.Mercancias
-                .FirstOrDefaultAsync(c => c.MercanciaId == request.ProveedorId);
+                .FirstOrDefaultAsync(c => c.MercanciaId == request.MercanciaId);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
             
@@ -121,4 +121,6 @@ public class MercanciaServices : IMercanciaServices
             return Result<List<MercanciaResponse>>.Fail(E.Message);
         }
     }
+
+    
 }

@@ -1,12 +1,16 @@
 @page "/proveedores"
+@inject IJSRuntime JSRuntime
 
 @if (!ShowForm)
 {
     <h3>Proveedores (@Usuarios.Count)</h3>
-    <div class="mb-2">
+    <div class="mb-2 d-print-none">
         <button class="btn btn-success"
             @onclick="()=>{ShowForm = !ShowForm;}">
             Agregar
+        </button>
+        <button class="btn btn-danger" @onclick="GeneratePdf">
+            <span class="oi oi-print"></span>
         </button>
     </div>
 }
@@ -28,7 +32,7 @@
 
                 <div class="col-md-6 col-lg-6">
                     <label>Telefono</label>
-                    <InputText class="form-control" @bind-Value="request.Telefono"></InputText>
+                    <InputText class="form-control" data-mask="(999)-999-9999" placeholder="(999)-999-9999"  @bind-Value="request.Telefono"></InputText>
                 </div>
 
                 <div class="col-md-6 col-lg-6">
@@ -73,7 +77,7 @@
                 <td>@usuario.Telefono</td>
                 <td>@usuario.CorreoElectronico</td>
                 <td>@usuario.Estado</td>
-                <td>
+                <td class="d-print-none">
                     <div class="btn-group">
                         <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.ProveedorId)">
 
@@ -169,7 +173,11 @@ else
             StateHasChanged();
         }
     }
-    
+    private async Task GeneratePdf()
+    {
+        var memoryStream = new MemoryStream();
+        await JSRuntime.InvokeVoidAsync("print");
+    }
     public void Agregar()
     {
         urlHelper.NavigateTo("/proveedores/crear",false);

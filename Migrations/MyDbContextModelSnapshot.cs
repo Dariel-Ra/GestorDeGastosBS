@@ -36,7 +36,7 @@ namespace GestorDeGastosBS.Migrations
                     b.Property<string>("Cedula")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Estado")
+                    b.Property<bool>("Inactivo")
                         .HasColumnType("bit");
 
                     b.Property<string>("NombreCompleto")
@@ -44,6 +44,7 @@ namespace GestorDeGastosBS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Sueldo")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("EmpleadoId");
@@ -137,6 +138,7 @@ namespace GestorDeGastosBS.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("MontoTotal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Nombre")
@@ -164,6 +166,7 @@ namespace GestorDeGastosBS.Migrations
                         .HasColumnType("Date");
 
                     b.Property<decimal>("MontoTotal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ProveedorId")
@@ -193,6 +196,7 @@ namespace GestorDeGastosBS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Precio")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ProveedorId")
@@ -207,13 +211,14 @@ namespace GestorDeGastosBS.Migrations
 
             modelBuilder.Entity("GestorDeGastosBS.Data.Models.Nomina", b =>
                 {
-                    b.Property<int>("Nominaid")
+                    b.Property<int>("NominaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Nominaid"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NominaId"));
 
                     b.Property<decimal>("Deducciones")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EmpleadoId")
@@ -223,15 +228,18 @@ namespace GestorDeGastosBS.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("Incentivos")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("MontoBruto")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("MontoNeto")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("Nominaid");
+                    b.HasKey("NominaId");
 
                     b.HasIndex("EmpleadoId");
 
@@ -286,14 +294,18 @@ namespace GestorDeGastosBS.Migrations
                         .HasMaxLength(45)
                         .HasColumnType("nvarchar(45)");
 
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(45)
-                        .HasColumnType("nvarchar(45)");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
 
                     b.HasKey("UsuarioId");
 

@@ -31,7 +31,6 @@ public class MercanciaResponse
             MercanciaDescripcion = MercanciaDescripcion,
             Precio = Precio,
             ProveedorId = ProveedorId
-
         };
     }
 }
@@ -75,15 +74,49 @@ public class ProveedorResponse
 
 public class EmpleadoResponse
 {
-    public int EmpleadoId { get; set; }
+    public int EmpleadoId {get; set; }
     public string NombreCompleto { get; set; } = null!;
-    public bool Estado { get; set; }
+    public string? Cargo { get; set; }
+    public string? Cedula { get; set; }
+    public decimal Sueldo { get; set; }
+    public bool Inactivo { get; set; }
+
+    public EmpleadoRequest ToRequest(){
+        return new EmpleadoRequest
+        {
+            EmpleadoId = EmpleadoId,
+            NombreCompleto = NombreCompleto, 
+            Cargo = Cargo,
+            Cedula = Cedula,
+            Sueldo = Sueldo,
+            Inactivo = Inactivo,
+        };
+    }
 }
 
 public class NominaResponse
 {
-    public int Nominaid { get; set; }
-    public EmpleadoResponse Empleado { get; set; } = null!;
+    public int NominaId { get; set; }
+    public DateTime Fecha { get; set; }
+    public decimal Incentivos { get; set; }
+    public decimal MontoBruto { get; set; }
+    public decimal Deducciones { get; set; }
+    public decimal MontoNeto { get; set; }
+    public int EmpleadoId { get; set; }
+    public virtual EmpleadoResponse Empleado { get; set; } = null!;
+
+    public NominaRequest ToRequest(){
+        return new NominaRequest
+        {
+            NominaId = NominaId,
+            Fecha = Fecha, 
+            Incentivos = Incentivos,
+            MontoBruto = MontoBruto,
+            Deducciones = Deducciones,
+            MontoNeto = MontoNeto,
+            EmpleadoId = Empleado.EmpleadoId
+        };
+    }
 }
 
 public class GastoGeneralesResponse
@@ -99,9 +132,24 @@ public class GastoGeneralesResponse
 public class GastosMiscelaneoResponse
 {
     public int GastosMiscelaneoId { get; set; }
+    public string Nombre { get; set; } = null!;
     public DateTime Fecha { get; set; }
-    public string Descripcion { get; set; } = null!;
     public int Cantidad { get; set; }
+    public decimal MontoTotal { get; set; }
+    public string Descripcion { get; set; } = null!;
+
+    public GastosMiscelaneoRequest ToRequest() {
+        return new GastosMiscelaneoRequest
+        {
+            GastosMiscelaneoId = GastosMiscelaneoId,
+            Nombre = Nombre,
+            Fecha = Fecha,
+            Cantidad = Cantidad,
+            MontoTotal = MontoTotal,
+            Descripcion = Descripcion
+        };
+    }
+    
 }
 
 public class GastosProveedorResponse

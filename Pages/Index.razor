@@ -1,5 +1,5 @@
 ﻿@page "/"
-
+@* @using ChartJs.Blazor.PieChart *@
 <PageTitle>Index</PageTitle>
 <AuthorizeView>
     <Authorized>
@@ -7,6 +7,9 @@
         <p>Autorizado</p>
         Welcome to your new app.
         <SurveyPrompt Title="How is Blazor working for you?" />
+
+        <h1>Chart Test</h1>
+        <Chart Config="_pieConfig"></Chart>
     </Authorized>
     <NotAuthorized>
         <div class="alert-danger">
@@ -15,3 +18,43 @@
     </NotAuthorized>
 </AuthorizeView>
 
+@code
+{
+    @* private PieConfig _pieConfig;
+
+    protected override void OnInitialized()
+    {
+        ConfigurePieConfig();
+    }
+
+    private void ConfigurePieConfig()
+    {
+        _pieConfig = new PieConfig();
+
+        _pieConfig.Options = new PieOptions
+        {
+            Responsive = true,
+            Title = new OptionsTitle
+            {
+                Display = true,
+                Text = "Title of my chart"
+            }
+        };
+        foreach(var party in new[] {"Party 1", "Party 2", "Party 3"})
+        {
+            _pieConfig.Data.Labels.Add(party);
+        }
+
+        var dataset = new PieDataset<int>(new[] {35, 50, 25})
+        {
+            BackgroundColor = new[]
+            {
+                ColorUtil.ColorHexString(255, 0, 0),
+                ColorUtil.ColorHexString(0, 255, 0),
+                ColorUtil.ColorHexString(0, 0, 255)
+            }            
+        };
+
+        _pieConfig.Data.Datasets.Add(dataset);
+    } *@
+}

@@ -129,19 +129,19 @@ public class ProveedorServices : IProveedorServices
         }
     }
 
-        public async Task<Result<List<ProveedorResponse>>> ConsultarSoftDeleted(string filtro)
-    {
-        try
-        {
-            var contactos = await dbContext.Proveedores
-                .Where(c => c.Estado == false)
-                .Select(c => c.ToResponse())
-                .ToListAsync();
-            return Result<List<ProveedorResponse>>.Success(contactos, "Ok");
-        }
-        catch (Exception E)
-        {
-            return Result<List<ProveedorResponse>>.Fail(E.Message);
-        }
-    }
+    // public async Task<Result<List<ProveedorResponse>>> ConsultarSoftDeleted(string filtro)
+    // {
+    //     try
+    //     {
+    //         var contactos = await dbContext.Proveedores
+    //             .Where(c => c.Estado == false)
+    //             .Select(c => c.ToResponse())
+    //             .ToListAsync();
+    //         return Result<List<ProveedorResponse>>.Success(contactos, "Ok");
+    //     }
+    //     catch (Exception E)
+    //     {
+    //         return Result<List<ProveedorResponse>>.Fail(E.Message);
+    //     }
+    // }
 }

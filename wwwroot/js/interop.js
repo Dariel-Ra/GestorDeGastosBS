@@ -37,3 +37,5 @@ window.saveAsFile = function (fileName, contentType, data) {
         }
     }
 };
+
+window.print;

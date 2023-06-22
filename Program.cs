@@ -23,20 +23,24 @@ builder.Services.AddScoped<IAuthService,AuthService>();
 builder.Services.AddScoped<IProveedorServices, ProveedorServices>();
 builder.Services.AddScoped<IMercanciaServices, MercanciaServices>();
 
+
 builder.Services.AddScoped<IGastosProveedorServices, GastosProveedorServices>();
 builder.Services.AddScoped<IGastosMercanciaServices, GastosMercanciaServices>();
+builder.Services.AddScoped<IGastosMiscelaneoServices, GastosMiscelaneoServices>();
+builder.Services.AddScoped<INominaServices, NominaServices>();
+builder.Services.AddScoped<IEmpleadoServices, EmpleadoServices>();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-builder.Services.AddSingleton<UserAccountService>();
+builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddHttpContextAccessor();
 // builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 // .AddCookie();
 
 
-
-
 var app = builder.Build();
+
+app.UseRouting();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -45,6 +49,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 

@@ -60,7 +60,7 @@ else
         private async Task GeneratePdf()
         {
             var memoryStream = new MemoryStream();
-            await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", "WeatherForecast.pdf", "application/pdf", memoryStream.ToArray());
+            await JSRuntime.InvokeVoidAsync("print");
         }
 
 

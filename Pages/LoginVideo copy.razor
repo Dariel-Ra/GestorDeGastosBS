@@ -1,7 +1,7 @@
-@page "/login"
+@* @page "/login"
 @using GestorDeGastosBS.Data.Response
 @using GestorDeGastosBS.Authentication
-@inject IUserAccountService userAccountService
+@inject UserAccountService userAccountService
 @inject IJSRuntime js
 @inject AuthenticationStateProvider authStateProvider
 @inject NavigationManager urlHelper
@@ -26,7 +26,6 @@
         <button @onclick="Authenticate" class="btn btn-primary">Login</button>
     </div>
 </div>    
-
 @code{
     public class Model
     {
@@ -39,7 +38,7 @@
 
     private async Task Authenticate() 
     {
-        var userAccount = await userAccountService.GetByUserName(model.UserName!);
+        var userAccount = userAccountService.GetByUserName(model.UserName!);
         if(userAccount == null || userAccount.Password != model.Password)
         {
             await js.InvokeVoidAsync("alert", "Invalid User Name or Password");
@@ -54,4 +53,4 @@
         urlHelper.NavigateTo("/", true);
     }
 
-}
+} *@

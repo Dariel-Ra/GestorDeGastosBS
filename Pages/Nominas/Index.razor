@@ -1,0 +1,186 @@
+@page "/nominas"
+
+@if (!ShowForm)
+{
+    <h3>Nominas (@Usuarios.Count)</h3>
+    <div class="mb-2">
+        <button class="btn btn-success"
+            @onclick="()=>{ShowForm = !ShowForm;}">
+            Agregar
+        </button>
+    </div>
+}
+@if (ShowForm)
+{
+    <h3>@TituloForm</h3>
+    <EditForm Model="request" OnValidSubmit="Send">
+        <div class="form-group">
+            <div class="row g3">
+                <div class="col-md-4 col-lg-4">
+                    <label>Fecha</label>
+                    <InputDate class="form-control" @bind-Value="request.Fecha"></InputDate>
+                </div>
+
+                <div class="col-md-4 col-lg-4">
+                    <label>Empleados</label>
+                    <InputSelect class="form-select" @bind-Value="request.EmpleadoId" id="cbkActivo">
+                        <option disabled>Selecciona una ciudad</option>
+                        @foreach (var ciudad in Empleados)
+                        {
+                            <option value="@ciudad.EmpleadoId">
+                                @ciudad.NombreCompleto
+                                </option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Sueldo</label>
+                    <InputNumber class="form-control" @bind-Value="request.MontoBruto"></InputNumber>
+                </div>
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Incetivos</label>
+                    <InputNumber class="form-control" @bind-Value="request.Incentivos"></InputNumber>
+                </div>
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Deducciones</label>
+                    <InputNumber class="form-control" @bind-Value="request.Deducciones"></InputNumber>
+                </div>
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>MontoNeto</label>
+                    <InputNumber class="form-control" @bind-Value="request.MontoNeto"></InputNumber>
+                </div>
+
+            </div>
+        </div>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-outline-success">Guardar</button>
+            <button @onclick="Cancelar" class="btn btn-outline-danger">Cancelar</button>
+        </div>
+    </EditForm>
+    <br/>
+}
+@if(Usuarios != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Empleados</th>
+                <th>Incetivos</th>
+                <th>MontoBruto</th>
+                <th>Deducciones</th>
+                <th>MontoNeto</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var usuario in Usuarios){
+            <tr>
+                <td>@usuario.NominaId</td>
+                <td>@usuario.Empleado.NombreCompleto</td>
+                <td>@usuario.Fecha</td>
+                <td>@usuario.Incentivos</td>
+                <td>@usuario.MontoBruto</td>
+                <td>@usuario.Deducciones</td>
+                <td>@usuario.MontoNeto</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.NominaId)">
+
+                            <span class="oi oi-pencil"></span>
+                        </button>
+                        <button class="btn btn-danger">
+                            <span class="oi oi-trash"></span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Cargando..</p>
+}
+
+@code
+{
+    public string TituloForm => request.NominaId == 0 ? 
+    "Agregar Mercancia" : "Modificar Mercancia";
+    public bool ShowForm { get; set; } = false;
+    public string Filtro { get; set; } = "";
+    public List<NominaResponse> Usuarios { get; set; }
+        = new List<NominaResponse>();
+    public NominaRequest request { get; set; } = new NominaRequest();
+    public List<EmpleadoResponse> Empleados { get; set; } = new List<EmpleadoResponse>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarContactos();
+        await CargarEmpleados();
+    }
+
+    async Task CargarContactos()
+    {
+        var response = await nominaServices.Consultar(Filtro);
+        if (response.Succeeded)
+        {
+            Usuarios = response.Data!;
+        }
+    }
+
+    void Cancelar()
+    {
+        request  = new NominaRequest();
+        ShowForm = false;
+    }
+
+    async Task CargarEmpleados()
+    {
+        var resultado = await empleadoServices.Consultar(Filtro);
+        if (resultado.Succeeded)
+        {
+            Empleados = resultado.Data!;
+        }
+    }
+
+    public async Task Send()
+    {
+        if(request.NominaId == 0)
+        {
+            //Debo registrar el contacto..
+            var r = await nominaServices.Crear(request);
+            if (r.Succeeded)
+            {
+                Cancelar();
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            //Debo solicitar modificar el contacto...
+            var r = await nominaServices.Modificar(request);
+            if (r.Succeeded)
+            {
+                Cancelar();
+                await CargarContactos();
+                StateHasChanged();
+            }
+        }
+    }
+    	
+    public void Seleccionar(int Id)
+    {
+        ShowForm = true;
+        request = Usuarios
+        .Where(c => c.NominaId == Id)
+        .Select(c => c.ToRequest())
+        .FirstOrDefault()??new NominaRequest();
+    }
+    
+
+}
+

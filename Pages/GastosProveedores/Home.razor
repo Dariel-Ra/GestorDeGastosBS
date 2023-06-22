@@ -1,3 +1,5 @@
+@using ChartJs.Blazor.PieChart
+
 @page "/gastosproveedores"
 
 @if (!ShowForm)
@@ -16,7 +18,6 @@
     <EditForm Model="request" OnValidSubmit="Send">
         <div class="form-group">
             <div class="row g3">
-
                 <div class="py-md-1 col-md-4 col-lg-4">
                     <label>Proveedores</label>
                     <InputSelect class="py-md-1 form-select" @bind-Value="request.ProveedorId" id="cbkActivo">
@@ -25,7 +26,7 @@
                         {
                             <option value="@ciudad.ProveedorId">
                                 @ciudad.Nombre
-                                </option>
+                            </option>
                         }
                     </InputSelect>
                 </div>
@@ -97,21 +98,27 @@ else
 
 @code
 {
-    public string TituloForm => request.ProveedorId == 0 ? 
+    public string TituloForm => request.GastosProveedorId == 0 ? 
     "Agregar proveedor" : "Modificar proveedor";
     public bool ShowForm { get; set; } = false;
     public string Filtro { get; set; } = "";
+    @* private PieConfig _pieConfig; *@
+
     public List<GastosProveedorResponse> Usuarios { get; set; }
         = new List<GastosProveedorResponse>();
 
     public List<ProveedorResponse> Proveedores { get; set; } = new List<ProveedorResponse>();
     public GastosProveedorRequest request { get; set; } = new GastosProveedorRequest();
 
+
     protected override async Task OnInitializedAsync()
     {
         await CargarContactos();
         await CargarProveedores();
     }
+
+    
+
 
     async Task CargarContactos()
     {
@@ -172,6 +179,39 @@ else
         .FirstOrDefault()??new GastosProveedorRequest();
     }
     
+    @* private void ConfigurePieConfig()
+    {
+        _pieConfig = new PieConfig();
+
+
+
+        _pieConfig.Options = new PieOptions
+        {
+            Responsive = true,
+            Title = new OptionsTitle
+            {
+                Display = true,
+                Text = "Title of my chart"
+            }
+        };
+        foreach(var party in new[] {"Party 1", "Party 2", "Party 3"})
+        {
+            _pieConfig.Data.Labels.Add(party);
+        }
+
+        var dataset = new PieDataset<int>(new[] {35, 50, 25})
+        {
+            BackgroundColor = new[]
+            {
+                ColorUtil.ColorHexString(255, 0, 0),
+                ColorUtil.ColorHexString(0, 255, 0),
+                ColorUtil.ColorHexString(0, 0, 255)
+            }            
+        };
+
+        _pieConfig.Data.Datasets.Add(dataset);
+    } *@
+
     public void Agregar()
     {
         urlHelper.NavigateTo("/proveedores/crear",false);
