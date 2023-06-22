@@ -7,32 +7,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GestorDeGastosBS.Data.Services;
 
-public interface IMercanciaServices
+public interface IProductoServices
 {
-    Task<Result<List<MercanciaResponse>>> Consultar(string filtro);
-    Task<Result> Crear(MercanciaRequestUpdate request);
-    Task<Result> Eliminar(MercanciaRequestUpdate request);
-    Task<Result> SoftDeleted(MercanciaRequestUpdate request);
-    Task<Result> Modificar(MercanciaRequestUpdate request);
+    Task<Result<List<ProductoResponse>>> Consultar(string filtro);
+    Task<Result> Crear(ProductoRequestUpdate request);
+    Task<Result> Eliminar(ProductoRequestUpdate request);
+    Task<Result> SoftDeleted(ProductoRequestUpdate request);
+    Task<Result> Modificar(ProductoRequestUpdate request);
 }
 
-public class MercanciaServices : IMercanciaServices
+public class ProductoServices : IProductoServices
 {
     private readonly IMyDbContext dbContext;
 
-    public MercanciaServices(IMyDbContext dbContext)
+    public ProductoServices(IMyDbContext dbContext)
     {
         this.dbContext = dbContext;
     }
 
-    public async Task<Result> Crear(MercanciaRequestUpdate request)
+    public async Task<Result> Crear(ProductoRequestUpdate request)
     {
         try
         {
-            var mercancia = Mercancia.Crear(request);
-            dbContext.Mercancias.Add(mercancia);
+            var mercancia = Producto.Crear(request);
+            dbContext.Productos.Add(mercancia);
             await dbContext.SaveChangesAsync();
-            return Result<int>.Success(mercancia.MercanciaId);
+            return Result<int>.Success(mercancia.Id);
         }
         catch (Exception E)
         {
@@ -40,12 +40,12 @@ public class MercanciaServices : IMercanciaServices
             return Result.Fail(E.Message);
         }
     }
-    public async Task<Result> Modificar(MercanciaRequestUpdate request)
+    public async Task<Result> Modificar(ProductoRequestUpdate request)
     {
         try
         {
-            var contacto = await dbContext.Mercancias
-                .FirstOrDefaultAsync(c => c.MercanciaId == request.MercanciaId);
+            var contacto = await dbContext.Productos
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
 
@@ -60,16 +60,16 @@ public class MercanciaServices : IMercanciaServices
             return Result.Fail(E.Message);
         }
     }
-    public async Task<Result> Eliminar(MercanciaRequestUpdate request)
+    public async Task<Result> Eliminar(ProductoRequestUpdate request)
     {
         try
         {
-            var contacto = await dbContext.Mercancias
-                .FirstOrDefaultAsync(c => c.MercanciaId == request.MercanciaId);
+            var contacto = await dbContext.Productos
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
 
-            dbContext.Mercancias.Remove(contacto);
+            dbContext.Productos.Remove(contacto);
             await dbContext.SaveChangesAsync();
             return Result.Sucess("Ok");
         }
@@ -80,12 +80,12 @@ public class MercanciaServices : IMercanciaServices
         }
     }
 
-    public async Task<Result> SoftDeleted(MercanciaRequestUpdate request)
+    public async Task<Result> SoftDeleted(ProductoRequestUpdate request)
     {
         try
         {
-            var contacto = await dbContext.Mercancias
-                .FirstOrDefaultAsync(c => c.MercanciaId == request.MercanciaId);
+            var contacto = await dbContext.Productos
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
             
@@ -100,25 +100,25 @@ public class MercanciaServices : IMercanciaServices
         }
     }
 
-    public async Task<Result<List<MercanciaResponse>>> Consultar(string filtro)
+    public async Task<Result<List<ProductoResponse>>> Consultar(string filtro)
     {
         try
         {
-            var contactos = await dbContext.Mercancias
+            var contactos = await dbContext.Productos
                 .Include(p => p.Proveedor)
                 .Where(c =>
-                    (c.MercanciaNombre + " " + c.MercanciaDescripcion)
+                    (c.Nombre + " " + c.Descripcion)
                     .ToLower()
                     .Contains(filtro.ToLower()
                     )
                 )
                 .Select(c => c.ToResponse())
                 .ToListAsync();
-            return Result<List<MercanciaResponse>>.Success(contactos, "Ok");
+            return Result<List<ProductoResponse>>.Success(contactos, "Ok");
         }
         catch (Exception E)
         {
-            return Result<List<MercanciaResponse>>.Fail(E.Message);
+            return Result<List<ProductoResponse>>.Fail(E.Message);
         }
     }
 

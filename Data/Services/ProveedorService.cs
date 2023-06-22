@@ -32,7 +32,7 @@ public class ProveedorServices : IProveedorServices
             var mercancia = Proveedor.Crear(request);
             dbContext.Proveedores.Add(mercancia);
             await dbContext.SaveChangesAsync();
-            return Result<int>.Success(mercancia.ProveedorId);
+            return Result<int>.Success(mercancia.Id);
         }
         catch (Exception E)
         {
@@ -45,7 +45,7 @@ public class ProveedorServices : IProveedorServices
         try
         {
             var contacto = await dbContext.Proveedores
-                .FirstOrDefaultAsync(c => c.ProveedorId == request.ProveedorId);
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
 
@@ -65,7 +65,7 @@ public class ProveedorServices : IProveedorServices
         try
         {
             var contacto = await dbContext.Proveedores
-                .FirstOrDefaultAsync(c => c.ProveedorId == request.ProveedorId);
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
 
@@ -85,17 +85,17 @@ public class ProveedorServices : IProveedorServices
         try
         {
             var contacto = await dbContext.Proveedores
-                .FirstOrDefaultAsync(c => c.ProveedorId == request.ProveedorId);
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
             
-            if (contacto.Estado == true)
+            if (contacto.IsDeleted == true)
             {
-                contacto.Estado = false;
+                contacto.IsDeleted = false;
             }
-            else if (contacto.Estado == false)
+            else if (contacto.IsDeleted == false)
             {
-                contacto.Estado = true;
+                contacto.IsDeleted = true;
             }
             await dbContext.SaveChangesAsync();
             return Result.Sucess("Ok");
@@ -114,7 +114,7 @@ public class ProveedorServices : IProveedorServices
         {
             var contactos = await dbContext.Proveedores
                 .Where(c =>
-                    (c.Nombre + " " + c.Direccion + " " + c.Telefono + " " + c.CorreoElectronico + " " + c.Estado)
+                    (c.Nombre + " " + c.Direccion + " " + c.Telefono + " " + c.CorreoElectronico + " " + c.IsDeleted)
                     .ToLower()
                     .Contains(filtro.ToLower()
                     )

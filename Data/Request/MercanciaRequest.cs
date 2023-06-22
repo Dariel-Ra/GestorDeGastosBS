@@ -1,16 +1,18 @@
 ﻿namespace GestorDeGastosBS.Data.Request;
 
-public class MercanciaRequest
+public class ProductoRequest
 {
-    public string MercanciaNombre { get; set; } = null!;
-    public string MercanciaDescripcion { get;set; } = null!; 
+    public string Nombre { get; set; } = null!;
+    public string Descripcion { get;set; } = null!; 
+    public int Stock { get; set; }
     public decimal Precio { get; set; }
-    public int? ProveedorId { get; set; }
+    public int ProveedorId { get; set; }
 }
-public class MercanciaRequestUpdate : MercanciaRequest
+public class ProductoRequestUpdate : ProductoRequest
 {
-    public int MercanciaId { get; set; }
+    public int Id { get; set; }
 }
+
 
 public class ProveedorRequest
 {
@@ -18,11 +20,11 @@ public class ProveedorRequest
     public string Direccion { get; set; } = null!;
     public string Telefono { get; set; } = null!;
     public string CorreoElectronico { get; set; } = null!;
-    public bool Estado { get; set; }
+    public bool IsDeleted { get; set; }
 }
 public class ProveedorRequestUpdate : ProveedorRequest
 {
-    public int ProveedorId { get; set; }
+    public int Id { get; set; }
 }
 
 public class EmpleadoRequest{
@@ -60,25 +62,30 @@ public class GastosMiscelaneoRequest{
     public DateTime Fecha { get; set; } = DateTime.Now;
     public string Nombre { get; set; } = null!;
     public int Cantidad { get; set; }
+    public decimal Precio { get; set; }
     public decimal MontoTotal { get; set; }
     public string Descripcion { get; set; } = null!;
 }
 
 public class GastosProveedorRequest{
-    public int GastosProveedorId { get; set; }
+    public int Id { get; set; }
     public DateTime Fecha { get; set; } = DateTime.Now;
     public string Descripcion { get; set; } = null!;
+    public int Cantidad { get; set; }
+    public decimal Precio { get; set; }
     public decimal MontoTotal { get; set; }
-    public int? ProveedorId { get; set; }
+    public int ProductoId { get; set; }
+    public int ProveedorId { get; set; }
 
 }
+
 
 public class GastosMercanciaRequest{
     public DateTime Fecha { get; set; } = DateTime.Now;
     public int Cantidad { get; set; }
     public decimal MontoTotal { get; set; }
     public string Descripcion { get; set; } = null!;
-    public int MercanciaId { get; set; }
+    public int ProductoId { get; set; }
 }
 public class GastosMercanciaRequestUpdate : GastosMercanciaRequest
 {

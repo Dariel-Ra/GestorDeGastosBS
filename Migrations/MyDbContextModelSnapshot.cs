@@ -63,16 +63,16 @@ namespace GestorDeGastosBS.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("GastosMercanciaId")
+                    b.Property<int?>("GastosMercanciaId")
                         .HasColumnType("int");
 
-                    b.Property<int>("GastosMiscelaneoId")
+                    b.Property<int?>("GastosMiscelaneoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("GastosProveedorId")
+                    b.Property<int?>("GastosProveedorId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Nominaid")
+                    b.Property<int?>("Nominaid")
                         .HasColumnType("int");
 
                     b.HasKey("GastoGeneralesId");
@@ -106,15 +106,15 @@ namespace GestorDeGastosBS.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("Date");
 
-                    b.Property<int>("MercanciaId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("MontoTotal")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
                     b.HasKey("GastosMercanciaId");
 
-                    b.HasIndex("MercanciaId");
+                    b.HasIndex("ProductoId");
 
                     b.ToTable("GastosMercancias");
                 });
@@ -137,13 +137,13 @@ namespace GestorDeGastosBS.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("MontoTotal")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Precio")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("GastosMiscelaneoId");
 
@@ -152,61 +152,40 @@ namespace GestorDeGastosBS.Migrations
 
             modelBuilder.Entity("GestorDeGastosBS.Data.Models.GastosProveedor", b =>
                 {
-                    b.Property<int>("GastosProveedorId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GastosProveedorId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Fecha")
-                        .HasColumnType("Date");
-
-                    b.Property<decimal>("MontoTotal")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ProveedorId")
-                        .HasColumnType("int");
-
-                    b.HasKey("GastosProveedorId");
-
-                    b.HasIndex("ProveedorId");
-
-                    b.ToTable("GastosProveedores");
-                });
-
-            modelBuilder.Entity("GestorDeGastosBS.Data.Models.Mercancia", b =>
-                {
-                    b.Property<int>("MercanciaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MercanciaId"));
-
-                    b.Property<string>("MercanciaDescripcion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MercanciaNombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("Precio")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("ProductoId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
                     b.Property<int?>("ProveedorId")
                         .HasColumnType("int");
 
-                    b.HasKey("MercanciaId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductoId");
 
                     b.HasIndex("ProveedorId");
 
-                    b.ToTable("Mercancias");
+                    b.ToTable("GastosProveedores");
                 });
 
             modelBuilder.Entity("GestorDeGastosBS.Data.Models.Nomina", b =>
@@ -246,13 +225,46 @@ namespace GestorDeGastosBS.Migrations
                     b.ToTable("Nominas");
                 });
 
-            modelBuilder.Entity("GestorDeGastosBS.Data.Models.Proveedor", b =>
+            modelBuilder.Entity("GestorDeGastosBS.Data.Models.Producto", b =>
                 {
-                    b.Property<int>("ProveedorId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProveedorId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Precio")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProveedorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProveedorId");
+
+                    b.ToTable("Productos");
+                });
+
+            modelBuilder.Entity("GestorDeGastosBS.Data.Models.Proveedor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CorreoElectronico")
                         .IsRequired()
@@ -262,7 +274,7 @@ namespace GestorDeGastosBS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Estado")
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Nombre")
@@ -273,7 +285,7 @@ namespace GestorDeGastosBS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ProveedorId");
+                    b.HasKey("Id");
 
                     b.ToTable("Proveedores");
                 });
@@ -316,27 +328,19 @@ namespace GestorDeGastosBS.Migrations
                 {
                     b.HasOne("GestorDeGastosBS.Data.Models.GastosMercancia", "GastosMercancia")
                         .WithMany()
-                        .HasForeignKey("GastosMercanciaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GastosMercanciaId");
 
                     b.HasOne("GestorDeGastosBS.Data.Models.GastosMiscelaneo", "GastoMiscelaneo")
                         .WithMany()
-                        .HasForeignKey("GastosMiscelaneoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GastosMiscelaneoId");
 
                     b.HasOne("GestorDeGastosBS.Data.Models.GastosProveedor", "GastosProveedor")
                         .WithMany()
-                        .HasForeignKey("GastosProveedorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GastosProveedorId");
 
                     b.HasOne("GestorDeGastosBS.Data.Models.Nomina", "Nomina")
                         .WithMany()
-                        .HasForeignKey("Nominaid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Nominaid");
 
                     b.Navigation("GastoMiscelaneo");
 
@@ -349,29 +353,28 @@ namespace GestorDeGastosBS.Migrations
 
             modelBuilder.Entity("GestorDeGastosBS.Data.Models.GastosMercancia", b =>
                 {
-                    b.HasOne("GestorDeGastosBS.Data.Models.Mercancia", "Mercancia")
+                    b.HasOne("GestorDeGastosBS.Data.Models.Producto", "Producto")
                         .WithMany()
-                        .HasForeignKey("MercanciaId")
+                        .HasForeignKey("ProductoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Mercancia");
+                    b.Navigation("Producto");
                 });
 
             modelBuilder.Entity("GestorDeGastosBS.Data.Models.GastosProveedor", b =>
                 {
+                    b.HasOne("GestorDeGastosBS.Data.Models.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GestorDeGastosBS.Data.Models.Proveedor", "Proveedor")
                         .WithMany()
                         .HasForeignKey("ProveedorId");
 
-                    b.Navigation("Proveedor");
-                });
-
-            modelBuilder.Entity("GestorDeGastosBS.Data.Models.Mercancia", b =>
-                {
-                    b.HasOne("GestorDeGastosBS.Data.Models.Proveedor", "Proveedor")
-                        .WithMany()
-                        .HasForeignKey("ProveedorId");
+                    b.Navigation("Producto");
 
                     b.Navigation("Proveedor");
                 });
@@ -385,6 +388,17 @@ namespace GestorDeGastosBS.Migrations
                         .IsRequired();
 
                     b.Navigation("Empleado");
+                });
+
+            modelBuilder.Entity("GestorDeGastosBS.Data.Models.Producto", b =>
+                {
+                    b.HasOne("GestorDeGastosBS.Data.Models.Proveedor", "Proveedor")
+                        .WithMany()
+                        .HasForeignKey("ProveedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proveedor");
                 });
 #pragma warning restore 612, 618
         }

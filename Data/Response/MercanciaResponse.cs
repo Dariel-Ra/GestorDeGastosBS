@@ -1,34 +1,38 @@
-﻿using GestorDeGastosBS.Data.Request;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using GestorDeGastosBS.Data.Request;
 
 namespace GestorDeGastosBS.Data.Response;
 
-public class MercanciaResponse
+public class ProductoResponse
 {
-    public MercanciaResponse()
+    public ProductoResponse()
     {
     }
 
-    public MercanciaResponse(int mercanciaId, string mercanciaNombre, string mercanciaDescripcion, decimal precio, ProveedorResponse? proveedor)
+    public ProductoResponse(int id, string nombre, string descripcion, int stock, decimal precio, ProveedorResponse proveedor)
     {
-        MercanciaId = mercanciaId;
-        MercanciaNombre = mercanciaNombre;
-        MercanciaDescripcion = mercanciaDescripcion;
+        Id = id;
+        Nombre = nombre;
+        Descripcion = descripcion;
+        Stock = stock;
         Precio = precio;
         Proveedor = proveedor;
     }
 
-    public int MercanciaId { get; set; }
-    public string MercanciaNombre { get; set; } = null!;
-    public string MercanciaDescripcion { get; set; } = null!;
+    public int Id { get; set; }
+    public string Nombre { get; set; } = null!;
+    public string Descripcion { get; set; } = null!;
+    public int Stock { get; set; }
     public decimal Precio { get; set; }
-    public int? ProveedorId { get; set; }
-    public virtual ProveedorResponse? Proveedor { get; set; }
+    public int ProveedorId { get; set; }
+    public virtual ProveedorResponse Proveedor { get; set; } = null!;
 
-    public MercanciaRequestUpdate ToRequest(){
-        return new MercanciaRequestUpdate{
-            MercanciaId = MercanciaId,
-            MercanciaNombre = MercanciaNombre,
-            MercanciaDescripcion = MercanciaDescripcion,
+    public ProductoRequestUpdate ToRequest(){
+        return new ProductoRequestUpdate{
+            Id = Id,
+            Nombre = Nombre,
+            Descripcion = Descripcion,
+            Stock = Stock,
             Precio = Precio,
             ProveedorId = ProveedorId
         };
@@ -41,32 +45,32 @@ public class ProveedorResponse
     {
     }
 
-    public ProveedorResponse(int proveedorId, string nombre, string direccion, string telefono, string correoElectronico, bool estado)
+    public ProveedorResponse(int id, string nombre, string direccion, string telefono, string correoElectronico, bool isDeleted)
     {
-        ProveedorId = proveedorId;
+        Id = id;
         Nombre = nombre;
         Direccion = direccion;
         Telefono = telefono;
         CorreoElectronico = correoElectronico;
-        Estado = estado;
+        IsDeleted = isDeleted;
     }
 
-    public int ProveedorId { get; set; }
+    public int Id { get; set; }
     public string Nombre { get; set; } = null!;
     public string Direccion { get; set; } = null!;
     public string Telefono { get; set; } = null!;
     public string CorreoElectronico { get; set; } = null!;
-    public bool Estado { get; set; }
+    public bool IsDeleted { get; set; }
 
         public ProveedorRequestUpdate ToRequest() {
         return new ProveedorRequestUpdate
         {
-            ProveedorId = ProveedorId,
+            Id = Id,
             Nombre = Nombre,
             Telefono = Telefono,
             Direccion = Direccion,
             CorreoElectronico = CorreoElectronico,
-            Estado = Estado
+            IsDeleted = IsDeleted
             
         };
     }
@@ -135,8 +139,10 @@ public class GastosMiscelaneoResponse
     public string Nombre { get; set; } = null!;
     public DateTime Fecha { get; set; }
     public int Cantidad { get; set; }
-    public decimal MontoTotal { get; set; }
+    public decimal Precio { get; set; }
     public string Descripcion { get; set; } = null!;
+    [NotMapped]
+    public decimal MontoTotal => Cantidad * Precio;
 
     public GastosMiscelaneoRequest ToRequest() {
         return new GastosMiscelaneoRequest
@@ -145,7 +151,6 @@ public class GastosMiscelaneoResponse
             Nombre = Nombre,
             Fecha = Fecha,
             Cantidad = Cantidad,
-            MontoTotal = MontoTotal,
             Descripcion = Descripcion
         };
     }
@@ -158,19 +163,26 @@ public class GastosProveedorResponse
     {
     }
 
-    public int GastosProveedorId { get; set; }
+    public int Id { get; set; }
     public DateTime Fecha { get; set; }
     public string Descripcion { get; set; } = null!;
-    public decimal MontoTotal { get; set; }
-    public virtual ProveedorResponse? Proveedor { get; set; } 
+    public int Cantidad { get; set; }
+    public decimal Precio { get; set; }
+    public virtual ProductoResponse? Producto { get; set; }
+    public virtual ProveedorResponse? Proveedor { get; set; }
+    [NotMapped]
+    public decimal MontoTotal => Cantidad * Precio;
 
     public GastosProveedorRequest ToRequest(){
         return new GastosProveedorRequest
         {
-            GastosProveedorId = GastosProveedorId,
+            Id = Id,
             Fecha = Fecha,
             Descripcion = Descripcion,
-            ProveedorId = Proveedor!.ProveedorId
+            Cantidad = Cantidad,
+            Precio = Precio,
+            ProductoId = Producto!.Id,
+            ProveedorId = Proveedor!.Id
         };
     }
 }
@@ -181,14 +193,14 @@ public class GastosMercanciaResponse
     {
     }
 
-    public GastosMercanciaResponse(int gastosMercanciaId, DateTime fecha, int cantidad, decimal montoTotal, string descripcion, MercanciaResponse mercancia)
+    public GastosMercanciaResponse(int gastosMercanciaId, DateTime fecha, int cantidad, decimal montoTotal, string descripcion, ProductoResponse producto)
     {
         GastosMercanciaId = gastosMercanciaId;
         Fecha = fecha;
         Cantidad = cantidad;
         MontoTotal = montoTotal;
         Descripcion = descripcion;
-        Mercancia = mercancia;
+        Producto = producto;
     }
 
     public int GastosMercanciaId { get; set; }
@@ -196,7 +208,7 @@ public class GastosMercanciaResponse
     public int Cantidad { get; set; }
     public decimal MontoTotal { get; set; }
     public string Descripcion { get; set; } = null!;
-    public virtual MercanciaResponse Mercancia { get; set; } = null!;
+    public virtual ProductoResponse Producto { get; set; } = null!;
 
         public GastosMercanciaRequestUpdate ToRequest(){
         return new GastosMercanciaRequestUpdate
@@ -206,7 +218,7 @@ public class GastosMercanciaResponse
             Cantidad = Cantidad,
             MontoTotal = MontoTotal,
             Descripcion = Descripcion,
-            MercanciaId = Mercancia!.MercanciaId
+            ProductoId = Producto!.Id
         };
     }
 }

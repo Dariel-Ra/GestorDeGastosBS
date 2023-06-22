@@ -9,7 +9,7 @@ public interface IMyDbContext
     DbSet<Usuario> Usuarios { get; set; }
     DbSet<Empleado> Empleados { get; set; }
     DbSet<Nomina> Nominas { get; set; }
-    DbSet<Mercancia> Mercancias { set; get; }
+    DbSet<Producto> Productos { set; get; }
     DbSet<Proveedor> Proveedores { get; set; }
     DbSet<GastosProveedor> GastosProveedores { get; set; }
     DbSet<GastosMercancia> GastosMercancias { get; set; }
@@ -42,7 +42,7 @@ public class MyDbContext : DbContext, IMyDbContext
     public DbSet<Usuario> Usuarios { set; get; } = null!;
     public DbSet<Empleado> Empleados { get; set; } = null!;
     public DbSet<Nomina> Nominas { get; set; } = null!;
-    public DbSet<Mercancia> Mercancias { set; get; } = null!;    
+    public DbSet<Producto> Productos { set; get; } = null!;    
     public DbSet<Proveedor> Proveedores { get; set; } = null!;
     public DbSet<GastosProveedor> GastosProveedores { get; set; } = null!;
     public DbSet<GastosMercancia> GastosMercancias { get; set; } = null!;

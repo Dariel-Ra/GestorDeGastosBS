@@ -37,7 +37,7 @@ namespace GestorDeGastosBS.Migrations
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
-                    MontoTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Precio = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -49,17 +49,17 @@ namespace GestorDeGastosBS.Migrations
                 name: "Proveedores",
                 columns: table => new
                 {
-                    ProveedorId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Direccion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Telefono = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CorreoElectronico = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Estado = table.Column<bool>(type: "bit", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Proveedores", x => x.ProveedorId);
+                    table.PrimaryKey("PK_Proveedores", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,45 +104,26 @@ namespace GestorDeGastosBS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GastosProveedores",
+                name: "Productos",
                 columns: table => new
                 {
-                    GastosProveedorId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Fecha = table.Column<DateTime>(type: "Date", nullable: false),
+                    Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MontoTotal = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    ProveedorId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GastosProveedores", x => x.GastosProveedorId);
-                    table.ForeignKey(
-                        name: "FK_GastosProveedores_Proveedores_ProveedorId",
-                        column: x => x.ProveedorId,
-                        principalTable: "Proveedores",
-                        principalColumn: "ProveedorId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Mercancias",
-                columns: table => new
-                {
-                    MercanciaId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MercanciaNombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MercanciaDescripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Stock = table.Column<int>(type: "int", nullable: false),
                     Precio = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    ProveedorId = table.Column<int>(type: "int", nullable: true)
+                    ProveedorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Mercancias", x => x.MercanciaId);
+                    table.PrimaryKey("PK_Productos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Mercancias_Proveedores_ProveedorId",
+                        name: "FK_Productos_Proveedores_ProveedorId",
                         column: x => x.ProveedorId,
                         principalTable: "Proveedores",
-                        principalColumn: "ProveedorId");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -155,17 +136,46 @@ namespace GestorDeGastosBS.Migrations
                     Cantidad = table.Column<int>(type: "int", nullable: false),
                     MontoTotal = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MercanciaId = table.Column<int>(type: "int", nullable: false)
+                    ProductoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GastosMercancias", x => x.GastosMercanciaId);
                     table.ForeignKey(
-                        name: "FK_GastosMercancias_Mercancias_MercanciaId",
-                        column: x => x.MercanciaId,
-                        principalTable: "Mercancias",
-                        principalColumn: "MercanciaId",
+                        name: "FK_GastosMercancias_Productos_ProductoId",
+                        column: x => x.ProductoId,
+                        principalTable: "Productos",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GastosProveedores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Cantidad = table.Column<int>(type: "int", nullable: false),
+                    Precio = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ProductoId = table.Column<int>(type: "int", nullable: false),
+                    ProveedorId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GastosProveedores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GastosProveedores_Productos_ProductoId",
+                        column: x => x.ProductoId,
+                        principalTable: "Productos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GastosProveedores_Proveedores_ProveedorId",
+                        column: x => x.ProveedorId,
+                        principalTable: "Proveedores",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -175,10 +185,10 @@ namespace GestorDeGastosBS.Migrations
                     GastoGeneralesId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Nominaid = table.Column<int>(type: "int", nullable: false),
-                    GastosMercanciaId = table.Column<int>(type: "int", nullable: false),
-                    GastosProveedorId = table.Column<int>(type: "int", nullable: false),
-                    GastosMiscelaneoId = table.Column<int>(type: "int", nullable: false)
+                    Nominaid = table.Column<int>(type: "int", nullable: true),
+                    GastosMercanciaId = table.Column<int>(type: "int", nullable: true),
+                    GastosProveedorId = table.Column<int>(type: "int", nullable: true),
+                    GastosMiscelaneoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -187,26 +197,22 @@ namespace GestorDeGastosBS.Migrations
                         name: "FK_GastosGenerales_GastosMercancias_GastosMercanciaId",
                         column: x => x.GastosMercanciaId,
                         principalTable: "GastosMercancias",
-                        principalColumn: "GastosMercanciaId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "GastosMercanciaId");
                     table.ForeignKey(
                         name: "FK_GastosGenerales_GastosMiscelaneos_GastosMiscelaneoId",
                         column: x => x.GastosMiscelaneoId,
                         principalTable: "GastosMiscelaneos",
-                        principalColumn: "GastosMiscelaneoId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "GastosMiscelaneoId");
                     table.ForeignKey(
                         name: "FK_GastosGenerales_GastosProveedores_GastosProveedorId",
                         column: x => x.GastosProveedorId,
                         principalTable: "GastosProveedores",
-                        principalColumn: "GastosProveedorId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_GastosGenerales_Nominas_Nominaid",
                         column: x => x.Nominaid,
                         principalTable: "Nominas",
-                        principalColumn: "NominaId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "NominaId");
                 });
 
             migrationBuilder.CreateIndex(
@@ -230,9 +236,14 @@ namespace GestorDeGastosBS.Migrations
                 column: "Nominaid");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GastosMercancias_MercanciaId",
+                name: "IX_GastosMercancias_ProductoId",
                 table: "GastosMercancias",
-                column: "MercanciaId");
+                column: "ProductoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GastosProveedores_ProductoId",
+                table: "GastosProveedores",
+                column: "ProductoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GastosProveedores_ProveedorId",
@@ -240,14 +251,14 @@ namespace GestorDeGastosBS.Migrations
                 column: "ProveedorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Mercancias_ProveedorId",
-                table: "Mercancias",
-                column: "ProveedorId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Nominas_EmpleadoId",
                 table: "Nominas",
                 column: "EmpleadoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Productos_ProveedorId",
+                table: "Productos",
+                column: "ProveedorId");
         }
 
         /// <inheritdoc />
@@ -272,7 +283,7 @@ namespace GestorDeGastosBS.Migrations
                 name: "Nominas");
 
             migrationBuilder.DropTable(
-                name: "Mercancias");
+                name: "Productos");
 
             migrationBuilder.DropTable(
                 name: "Empleados");

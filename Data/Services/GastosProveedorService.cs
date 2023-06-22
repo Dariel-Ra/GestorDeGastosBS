@@ -32,7 +32,7 @@ public class GastosProveedorServices : IGastosProveedorServices
             var mercancia = GastosProveedor.Crear(request);
             dbContext.GastosProveedores.Add(mercancia);
             await dbContext.SaveChangesAsync();
-            return Result<int>.Success(mercancia.GastosProveedorId);
+            return Result<int>.Success(mercancia.Id);
         }
         catch (Exception E)
         {
@@ -45,7 +45,7 @@ public class GastosProveedorServices : IGastosProveedorServices
         try
         {
             var contacto = await dbContext.GastosProveedores
-                .FirstOrDefaultAsync(c => c.GastosProveedorId == request.GastosProveedorId);
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
 
@@ -65,7 +65,7 @@ public class GastosProveedorServices : IGastosProveedorServices
         try
         {
             var contacto = await dbContext.GastosProveedores
-                .FirstOrDefaultAsync(c => c.GastosProveedorId == request.GastosProveedorId);
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
 
@@ -85,7 +85,7 @@ public class GastosProveedorServices : IGastosProveedorServices
         try
         {
             var contacto = await dbContext.GastosProveedores
-                .FirstOrDefaultAsync(c => c.GastosProveedorId == request.GastosProveedorId);
+                .FirstOrDefaultAsync(c => c.Id == request.Id);
             if (contacto == null)
                 return Result.Fail("No se encontro el contacto");
             
@@ -105,6 +105,8 @@ public class GastosProveedorServices : IGastosProveedorServices
         {
             var contactos = await dbContext.GastosProveedores
                 .Include(p => p.Proveedor)
+                .Include(p => p.Producto)
+                .ThenInclude(p => p.Proveedor)
                 .Select(c => c.ToResponse())
                 .ToListAsync();
             return Result<List<GastosProveedorResponse>>.Success(contactos, "Ok");

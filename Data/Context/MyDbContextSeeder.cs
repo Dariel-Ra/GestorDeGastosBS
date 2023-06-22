@@ -9,14 +9,14 @@ namespace GestorDeGastosBS.Data.Context
             if (!dbContext.Proveedores.Any())
             {
                 var ciudades = new List<Proveedor>() { 
-                    new Proveedor(){ Nombre = "Xotic Flavors", Direccion = "Calle Comercial #25", Telefono = "809-214-8912", CorreoElectronico = "info@xoticflavors.com", Estado = true},
+                    new Proveedor(){ Nombre = "Xotic Flavors", Direccion = "Calle Comercial #25", Telefono = "809-214-8912", CorreoElectronico = "info@xoticflavors.com", IsDeleted = true},
                     new Proveedor()
                     { 
                         Nombre = "Exotic Imports", 
                         Direccion = "Calle de las Maravillas, 123", 
                         Telefono = "+1 234 567 890", 
                         CorreoElectronico = "info@exoticimports.com", 
-                        Estado = true
+                        IsDeleted = true
                     },
                     new Proveedor()
                     {
@@ -24,7 +24,7 @@ namespace GestorDeGastosBS.Data.Context
                         Direccion = "Avenida Internacional, 456",
                         Telefono = "555-123-4567",
                         CorreoElectronico = "info@globaltraders.com",
-                        Estado = true
+                        IsDeleted = true
                     },
                     new Proveedor()
                     {
@@ -32,7 +32,7 @@ namespace GestorDeGastosBS.Data.Context
                         Direccion = "Plaza de los Sueños, 789",
                         Telefono = "+1 987 654 3210",
                         CorreoElectronico = "info@wonderfulgoods.com",
-                        Estado = true
+                        IsDeleted = true
                     },
                     new Proveedor()
                     {
@@ -40,7 +40,7 @@ namespace GestorDeGastosBS.Data.Context
                         Direccion = "Calle de la Fantasía, 987",
                         Telefono = "123-456-7890",
                         CorreoElectronico = "info@uniquesupplies.com",
-                        Estado = true
+                        IsDeleted = true
                     },
                     new Proveedor()
                     {
@@ -48,7 +48,7 @@ namespace GestorDeGastosBS.Data.Context
                         Direccion = "Ruta de los Misterios, 543",
                         Telefono = "+1 789 012 3456",
                         CorreoElectronico = "info@mysticalimports.com",
-                        Estado = true
+                        IsDeleted = true
                     },
                     new Proveedor()
                     {
@@ -56,7 +56,7 @@ namespace GestorDeGastosBS.Data.Context
                         Direccion = "Avenida de los Sueños, 789",
                         Telefono = "555-987-6543",
                         CorreoElectronico = "info@dreamlandtraders.com",
-                        Estado = true
+                        IsDeleted = true
                     }
                 
                 };
@@ -64,19 +64,20 @@ namespace GestorDeGastosBS.Data.Context
                 await dbContext.SaveChangesAsync();
             }
 
-            if (!dbContext.Mercancias.Any())
+            if (!dbContext.Productos.Any())
             {
-                var mercancias = new List<Mercancia>() 
+                var mercancias = new List<Producto>() 
                 {
-                    new Mercancia()
+                    new Producto()
                     {
-                        MercanciaNombre = "Llantas Super X",
-                        MercanciaDescripcion = "Llantas todo terreno",
+                        Nombre = "Llantas Super X",
+                        Descripcion = "Llantas todo terreno",
+                        Stock = 50,
                         Precio = 500,
                         ProveedorId = 1
                     }
                 };
-                dbContext.Mercancias.AddRange(mercancias);
+                dbContext.Productos.AddRange(mercancias);
                 await dbContext.SaveChangesAsync();
             }
 

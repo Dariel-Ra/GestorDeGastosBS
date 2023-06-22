@@ -1,0 +1,157 @@
+@inject IJSRuntime JSRuntime
+@using Blazorise
+
+
+@page "/gastosproveedores/reporte"
+
+    <h3>Proveedores (@Usuarios.Count)</h3>
+    <div class="py-md-1 col-md-4 col-lg-4">
+        <label>Proveedores</label>
+        <InputSelect class="py-md-1 form-select" @bind-Value="request.ProveedorId" id="cbkActivo" @onchange="FiltrarTabla">
+            <option disabled>Selecciona una ciudad</option>
+            @foreach (var proveedor in Proveedores)
+                {
+                    <option value="@proveedor.Id">
+                    @proveedor.Nombre
+                    </option>
+                }
+        </InputSelect>
+    </div>
+    <div class="mb-2 d-print-none">
+        <button class="btn btn-success" @onclick="MostraInforme">
+            Reporte
+        </button>
+        <button class="btn btn-danger" @onclick="GeneratePdf">
+            <span class="oi oi-print"></span>
+        </button>
+    </div>
+
+    <Modal @ref="informeModalRef" IsOpen="indormeVisible">
+        <ModalContent class="modal-content my-custom-modal" Size="ModalSize.Fullscreen">
+                <ModalHeader>
+                    <h3>Proveedores</h3>
+                    
+                    <button class="btn btn-danger d-print-none" @onclick="GeneratePdf">
+                        <span class="oi oi-print"></span>
+                    </button>
+                </ModalHeader>
+                <ModalBody>
+                    <div class="row">
+                        <AuthorizeView>
+                            <Authorized>
+                                <p>Usuario: @context.User.Identity!.Name</p>
+                            </Authorized>
+                            <NotAuthorized>
+                                <p>No esta Autorizado</p>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                        <p>@fecha</p>
+                    </div>
+                    <div class="row">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fecha</th>
+                                    <th>Proveedores</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>SubTotal</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                                <tbody>
+                                    @foreach (var usuario in Usuarios){ 
+                                    <tr>
+                                        <td>@usuario.Id</td>
+                                        <td>@usuario.Fecha.ToString("MM/dd/yyyy")</td>
+                                        <td>@usuario.Proveedor!.Nombre</td>
+                                        <td>@usuario.Producto!.Nombre</td>
+                                        <td>@usuario.Cantidad</td>
+                                        <td>@usuario.Precio</td>
+                                        <td>@usuario.MontoTotal</td>
+                                        <td>@usuario.Descripcion</td>
+                                    </tr>   
+                                    }
+                                </tbody>
+
+                        </table>
+                    </div>
+                </ModalBody>
+        </ModalContent>
+    </Modal>
+
+@code
+{
+    public string Filtro { get; set; } = "";
+    private Modal informeModalRef;
+    private bool infoomeVisble = false;
+    private int selectedUsuarioId;
+    private DateTime fecha = DateTime.Today;
+    private void MostraInforme()
+    {   
+        FiltrarUsuarios();
+        infoomeVisble = true;
+        informeModalRef.Show();
+    }
+    public void SeleccionarUsuario(int usuarioId)
+    {
+    selectedUsuarioId = usuarioId;
+    informeModalRef.Show();
+    }
+
+    public List<GastosProveedorResponse> Usuarios { get; set; }
+        = new List<GastosProveedorResponse>();
+
+    public List<ProveedorResponse> Proveedores { get; set; } = new List<ProveedorResponse>();
+    public GastosProveedorRequest request { get; set; } = new GastosProveedorRequest();
+    private ProveedorResponse proveedorSeleccionado;
+
+    public List<ProductoResponse> Productos { get; set; } = new List<ProductoResponse>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarContactos();
+        await CargarProveedores();
+    }
+
+    async Task CargarContactos()
+    {
+        var response = await gastosProveedorServices.Consultar("");
+        if (response.Succeeded)
+        {
+            Usuarios = response.Data!;
+        }
+    }
+    async Task CargarProveedores()
+    {
+        var resultado = await proveedorServices.Consultar("");
+        if (resultado.Succeeded)
+        {
+            Proveedores = resultado.Data!;
+            if (request.ProveedorId != null)
+            {
+                proveedorSeleccionado = Proveedores.FirstOrDefault(p => p.Id == request.ProveedorId);
+            }
+        }
+    }
+
+    private async Task GeneratePdf()
+    {
+        var memoryStream = new MemoryStream();
+        await JSRuntime.InvokeVoidAsync("print");
+    }
+
+    private void FiltrarTabla(ChangeEventArgs e)
+    {
+        request.ProveedorId = Convert.ToInt32(e.Value);
+        Usuarios = Usuarios.Where(u => u.Proveedor.Id == request.ProveedorId).ToList();
+    }
+
+    private void FiltrarUsuarios()
+    {
+        if (request.ProveedorId != null)
+        Usuarios = Usuarios.Where(u => u.Proveedor.Id == request.ProveedorId).ToList();
+    }
+}

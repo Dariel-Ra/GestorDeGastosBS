@@ -9,6 +9,11 @@ using GestorDeGastosBS.Data.Models;
 using GestorDeGastosBS.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Blazorise;
+using Blazorise.Bootstrap5;
+using Blazorise.Icons.FontAwesome;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +26,7 @@ builder.Services.AddScoped<IMyDbContext,MyDbContext>();
 builder.Services.AddScoped<IAuthService,AuthService>();
 
 builder.Services.AddScoped<IProveedorServices, ProveedorServices>();
-builder.Services.AddScoped<IMercanciaServices, MercanciaServices>();
+builder.Services.AddScoped<IProductoServices, ProductoServices>();
 
 
 builder.Services.AddScoped<IGastosProveedorServices, GastosProveedorServices>();
@@ -36,6 +41,13 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddHttpContextAccessor();
 // builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 // .AddCookie();
+            builder.Services
+                .AddBlazorise( options =>
+                {
+                    options.Immediate = true;
+                } )
+                .AddBootstrap5Providers()
+                .AddFontAwesomeIcons();
 
 
 var app = builder.Build();

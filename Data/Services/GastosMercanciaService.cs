@@ -104,7 +104,7 @@ public class GastosMercanciaServices : IGastosMercanciaServices
         try
         {
             var contactos = await dbContext.GastosMercancias
-                .Include(p => p.Mercancia)
+                .Include(p => p.Producto)
                 .ThenInclude(p => p.Proveedor)
                 .Select(c => c.ToResponse())
                 .ToListAsync();

@@ -1,4 +1,5 @@
-@using ChartJs.Blazor.PieChart
+@inject IJSRuntime JSRuntime
+@using Blazorise
 
 @page "/gastosproveedores"
 
@@ -9,6 +10,9 @@
         <button class="btn btn-success"
             @onclick="()=>{ShowForm = !ShowForm;}">
             Agregar
+        </button>
+        <button class="btn btn-success" @onclick="Reporte">
+            Reporte
         </button>
     </div>
 }
@@ -24,20 +28,37 @@
                         <option disabled>Selecciona una ciudad</option>
                         @foreach (var ciudad in Proveedores)
                         {
-                            <option value="@ciudad.ProveedorId">
+                            <option value="@ciudad.Id">
                                 @ciudad.Nombre
                             </option>
                         }
                     </InputSelect>
                 </div>
+                
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Producto</label>
+                    <InputSelect class="py-md-1 form-select" @bind-Value="request.ProductoId" id="cbkActivo">
+                        <option disabled>Selecciona una ciudad</option>
+                        @foreach (var ciudad in Productos)
+                        {
+                            <option value="@ciudad.Id">
+                                @ciudad.Nombre
+                            </option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Cantidad</label>
+                    <InputNumber class="form-control" @bind-Value="request.Cantidad"></InputNumber>
+                </div>
 
                 <div class="py-md-1 col-md-4 col-lg-4">
-                    <label>Gastos</label>
-                    <InputNumber class="form-control" @bind-Value="request.MontoTotal"></InputNumber>
+                    <label>Precio</label>
+                    <InputNumber class="form-control" @bind-Value="request.Precio"></InputNumber>
                 </div>
                 <div class="py-md-1 col-md-4 col-lg-4">
                     <label>Fecha</label>
-                    <InputDate class="form-control" @bind-Value="request.Fecha"></InputDate>
+                    <InputDate class="form-control" readonly @bind-Value="request.Fecha"></InputDate>
                 </div>
 
                 <div class="py-md-1 col-md-max col-lg-max">
@@ -62,7 +83,10 @@
                 <th>#</th>
                 <th>Fecha</th>
                 <th>Proveedores</th>
-                <th>Gastos</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>SubTotal</th>
                 <th>Descripción</th>
                 <th></th>
             </tr>
@@ -70,14 +94,17 @@
         <tbody>
             @foreach (var usuario in Usuarios){
             <tr>
-                <td>@usuario.GastosProveedorId</td>
+                <td>@usuario.Id</td>
                 <td>@usuario.Fecha.ToString("MM/dd/yyyy")</td>
                 <td>@usuario.Proveedor!.Nombre</td>
+                <td>@usuario.Producto!.Nombre</td>
+                <td>@usuario.Cantidad</td>
+                <td>@usuario.Precio</td>
                 <td>@usuario.MontoTotal</td>
                 <td>@usuario.Descripcion</td>
                 <td>
                     <div class="btn-group">
-                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.GastosProveedorId)">
+                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.Id)">
 
                             <span class="oi oi-pencil"></span>
                         </button>
@@ -98,11 +125,25 @@ else
 
 @code
 {
-    public string TituloForm => request.GastosProveedorId == 0 ? 
+    private Modal informeModalRef;
+    private bool infoomeVisble = false;
+    private void MostraInforme()
+    {
+        infoomeVisble = true;
+        informeModalRef.Show();
+    }
+    public void SeleccionarUsuario(int usuarioId)
+    {
+    selectedUsuarioId = usuarioId;
+    informeModalRef.Show();
+    }
+    public string TituloForm => request.Id == 0 ? 
     "Agregar proveedor" : "Modificar proveedor";
     public bool ShowForm { get; set; } = false;
     public string Filtro { get; set; } = "";
     @* private PieConfig _pieConfig; *@
+    private int selectedUsuarioId;
+    private DateTime fecha = DateTime.Today;
 
     public List<GastosProveedorResponse> Usuarios { get; set; }
         = new List<GastosProveedorResponse>();
@@ -110,11 +151,12 @@ else
     public List<ProveedorResponse> Proveedores { get; set; } = new List<ProveedorResponse>();
     public GastosProveedorRequest request { get; set; } = new GastosProveedorRequest();
 
-
+    public List<ProductoResponse> Productos { get; set; } = new List<ProductoResponse>();
     protected override async Task OnInitializedAsync()
     {
         await CargarContactos();
         await CargarProveedores();
+        await CargarPrductos();
     }
 
     
@@ -138,6 +180,15 @@ else
         }
     }
 
+    async Task CargarPrductos()
+    {
+        var resultado = await productoServices.Consultar(Filtro);
+        if (resultado.Succeeded)
+        {
+            Productos = resultado.Data!;
+        }
+    }
+
     void Cancelar()
     {
         request  = new GastosProveedorRequest();
@@ -146,15 +197,18 @@ else
 
     public async Task Send()
     {
-        if(request.GastosProveedorId == 0)
+        if(request.Id == 0)
         {
             //Debo registrar el contacto..
             var r = await gastosProveedorServices.Crear(request);
+            @* var producto = Productos.FirstOrDefault(p => p.Id == request.ProveedorId); *@
             if (r.Succeeded)
             {
                 Cancelar();
                 await CargarContactos();
+                @* producto!.Stock =+ request.Cantidad; *@
                 StateHasChanged();
+                
             }
         }
         else
@@ -174,7 +228,7 @@ else
     {
         ShowForm = true;
         request = Usuarios
-        .Where(c => c.GastosProveedorId == Id)
+        .Where(c => c.Id == Id)
         .Select(c => c.ToRequest())
         .FirstOrDefault()??new GastosProveedorRequest();
     }
@@ -212,6 +266,16 @@ else
         _pieConfig.Data.Datasets.Add(dataset);
     } *@
 
+    private async Task GeneratePdf()
+    {
+        var memoryStream = new MemoryStream();
+        await JSRuntime.InvokeVoidAsync("print");
+    }
+
+    public void Reporte()
+    {
+        urlHelper.NavigateTo("/gastosproveedores/reporte");
+    }
     public void Agregar()
     {
         urlHelper.NavigateTo("/proveedores/crear",false);

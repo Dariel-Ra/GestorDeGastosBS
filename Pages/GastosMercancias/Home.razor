@@ -18,12 +18,12 @@
             <div class="row g3">
                 <div class="py-md-1 col-md-3 col-lg-3">
                     <label>Mercancia</label>
-                    <InputSelect class="py-md-1 form-select" @bind-Value="request.MercanciaId" id="cbkActivo">
+                    <InputSelect class="py-md-1 form-select" @bind-Value="request.ProductoId" id="cbkActivo">
                         <option disabled>Selecciona una ciudad</option>
-                        @foreach (var ciudad in Mercancias)
+                        @foreach (var ciudad in Productos)
                         {
-                            <option value="@ciudad.MercanciaId">
-                                @ciudad.MercanciaNombre
+                            <option value="@ciudad.Id">
+                                @ciudad.Nombre
                             </option>
                         }
                     </InputSelect>
@@ -31,7 +31,7 @@
 
                 <div class="py-md-1 col-md-2 col-lg-2 col-xxl-2 col-xl-2">
                     <label>Cantidad</label>
-                    <InputNumber class="form-control" @bind-Value="request.Cantidad" @oninput="CalcularMontoTotal" @onkeypress="CalcularMontoTotal"></InputNumber>
+                    <InputNumber class="form-control" @bind-Value="request.Cantidad" ></InputNumber>
                 </div>
 
                 <div class="py-md-1 col-md-2 col-lg-2">
@@ -76,7 +76,7 @@
             <tr>
                 <td>@usuario.GastosMercanciaId</td>
                 <td>@usuario.Fecha.ToString("MMMM/dd/yyyy")</td>
-                <td>@usuario.Mercancia.MercanciaNombre</td>
+                <td>@usuario.Producto.Nombre</td>
                 <td>@usuario.Cantidad</td>
                 <td>@usuario.MontoTotal</td>
                 <td>@usuario.Descripcion</td>
@@ -113,7 +113,7 @@ else
 
     public List<ProveedorResponse> Proveedores { get; set; } = new List<ProveedorResponse>();
     
-    public List<MercanciaResponse> Mercancias { get; set; } = new List<MercanciaResponse>();
+    public List<ProductoResponse> Productos { get; set; } = new List<ProductoResponse>();
 
     public GastosMercanciaRequestUpdate request { get; set; } = new GastosMercanciaRequestUpdate();
 
@@ -144,10 +144,10 @@ else
 
     async Task CargarMercancias()
     {
-        var resultado = await mercanciaServices.Consultar(Filtro);
+        var resultado = await productoServices.Consultar(Filtro);
         if (resultado.Succeeded)
         {
-            Mercancias = resultado.Data!;
+            Productos = resultado.Data!;
         }
     }
 
@@ -192,18 +192,6 @@ else
         .FirstOrDefault()??new GastosMercanciaRequestUpdate();
     }
     
-void CalcularMontoTotal()
-{
-    var mercanciaSeleccionada = Mercancias.FirstOrDefault(m => m.MercanciaId == request.MercanciaId);
-    if (mercanciaSeleccionada != null)
-    {
-        request.MontoTotal = request.Cantidad * mercanciaSeleccionada.Precio;
-    }
-    else
-    {
-        request.MontoTotal = 0;
-    }
-}
 
     
 

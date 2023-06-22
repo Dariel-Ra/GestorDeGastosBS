@@ -1,10 +1,8 @@
-@using Blazorise.Bootstrap
-
-@page "/mercancias"
+@page "/productos"
 
 @if (!ShowForm)
 {
-    <h3>Mercancia (@Usuarios.Count)</h3>
+    <h3>Productos (@Usuarios.Count)</h3>
     <div class="mb-2">
         <button class="btn btn-success"
             @onclick="()=>{ShowForm = !ShowForm;}">
@@ -20,7 +18,7 @@
             <div class="row g3">
                 <div class="col-md-6 col-lg-6">
                     <label>Nombre</label>
-                    <InputText class="form-control" @bind-Value="request.MercanciaNombre"></InputText>
+                    <InputText class="form-control" @bind-Value="request.Nombre"></InputText>
                 </div>
 
                 <div class="col-md-6 col-lg-6">
@@ -29,11 +27,15 @@
                         <option disabled>Selecciona una ciudad</option>
                         @foreach (var ciudad in Proveedores)
                         {
-                            <option value="@ciudad.ProveedorId">
+                            <option value="@ciudad.Id">
                                 @ciudad.Nombre
                                 </option>
                         }
                     </InputSelect>
+                </div>
+                <div class="py-md-1 col-md-4 col-lg-4">
+                    <label>Cantidad</label>
+                    <InputNumber class="form-control" @bind-Value="request.Stock"></InputNumber>
                 </div>
                 <div class="py-md-1 col-md-4 col-lg-4">
                     <label>Precio</label>
@@ -42,7 +44,7 @@
 
                 <div class="py-2 col-md-max col-lg-max">
                     <label>Descricción</label>
-                    <InputTextArea class="form-control" @bind-Value="request.MercanciaDescripcion"></InputTextArea>
+                    <InputTextArea class="form-control" @bind-Value="request.Descripcion"></InputTextArea>
                 </div>
                 
 
@@ -62,6 +64,7 @@
             <tr>
                 <th>#</th>
                 <th>Nombre</th>
+                <th>Stock</th>
                 <th>Precio</th>
                 <th>Proveedor</th>
                 <th>Descricción</th>
@@ -71,14 +74,15 @@
         <tbody>
             @foreach (var usuario in Usuarios){
             <tr>
-                <td>@usuario.MercanciaId</td>
-                <td>@usuario.MercanciaNombre</td>
+                <td>@usuario.Id</td>
+                <td>@usuario.Nombre</td>
+                <td>@usuario.Stock</td>
                 <td>@usuario.Precio</td>
                 <td>@usuario.Proveedor!.Nombre</td>
-                <td>@usuario.MercanciaDescripcion</td>
+                <td>@usuario.Descripcion</td>
                 <td>
                     <div class="btn-group">
-                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.MercanciaId)">
+                        <button class="btn btn-warning" @onclick="()=>Seleccionar(usuario.Id)">
 
                             <span class="oi oi-pencil"></span>
                         </button>
@@ -91,7 +95,6 @@
             }
         </tbody>
     </table>
-    <Modal></Modal>
 }
 else
 {
@@ -100,16 +103,16 @@ else
 
 @code
 {
-    public string TituloForm => request.MercanciaId == 0 ? 
-    "Agregar Mercancia" : "Modificar Mercancia";
+    public string TituloForm => request.Id == 0 ? 
+    "Agregar Producto" : "Modificar Producto";
     public bool ShowForm { get; set; } = false;
     public string Filtro { get; set; } = "";
-    public List<MercanciaResponse> Usuarios { get; set; }
-        = new List<MercanciaResponse>();
+    public List<ProductoResponse> Usuarios { get; set; }
+        = new List<ProductoResponse>();
 
 
     public List<ProveedorResponse> Proveedores { get; set; } = new List<ProveedorResponse>();
-    public MercanciaRequestUpdate request { get; set; } = new MercanciaRequestUpdate();
+    public ProductoRequestUpdate request { get; set; } = new ProductoRequestUpdate();
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,7 +122,7 @@ else
 
     async Task CargarContactos()
     {
-        var response = await mercanciaServices.Consultar(Filtro);
+        var response = await productoServices.Consultar(Filtro);
         if (response.Succeeded)
         {
             Usuarios = response.Data!;
@@ -128,7 +131,7 @@ else
 
     void Cancelar()
     {
-        request  = new MercanciaRequestUpdate();
+        request  = new ProductoRequestUpdate();
         ShowForm = false;
     }
 
@@ -143,10 +146,10 @@ else
 
     public async Task Send()
     {
-        if(request.MercanciaId == 0)
+        if(request.Id == 0)
         {
             //Debo registrar el contacto..
-            var r = await mercanciaServices.Crear(request);
+            var r = await productoServices.Crear(request);
             if (r.Succeeded)
             {
                 Cancelar();
@@ -157,7 +160,7 @@ else
         else
         {
             //Debo solicitar modificar el contacto...
-            var r = await mercanciaServices.Modificar(request);
+            var r = await productoServices.Modificar(request);
             if (r.Succeeded)
             {
                 Cancelar();
@@ -171,9 +174,9 @@ else
     {
         ShowForm = true;
         request = Usuarios
-        .Where(c => c.MercanciaId == Id)
+        .Where(c => c.Id == Id)
         .Select(c => c.ToRequest())
-        .FirstOrDefault()??new MercanciaRequestUpdate();
+        .FirstOrDefault()??new ProductoRequestUpdate();
     }
     
 
